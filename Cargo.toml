@@ -1,0 +1,21 @@
+[package]
+name = "rustblox"
+description = "A Rust library for interacting with the Roblox API"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[profile.test]
+opt-level = 1
+
+[profile.test.package."*"]
+opt-level = 3
+
+[dependencies]
+log = "0.4.17"
+reqwest = { version = "0.11.12", features = ["json"] }
+serde = { version = "1.0.147", default-features = false, features = ["derive"] }
+
+[dev-dependencies]
+tokio = { version = "1.21.2", default-features = false, features = ["macros"] }
