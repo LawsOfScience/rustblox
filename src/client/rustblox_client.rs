@@ -1,5 +1,14 @@
+use reqwest::header::HeaderMap;
+use reqwest::Method;
 use crate::error::{ClientError, RequestError};
-use log::{warn, debug};
+
+pub(crate) struct RequestComponents {
+    pub(crate) needs_auth: bool,
+    pub(crate) method: Method,
+    pub(crate) url: String,
+    pub(crate) headers: Option<HeaderMap>,
+    pub(crate) body: Option<String>
+}
 
 pub struct RustbloxClient {
     pub(crate) reqwest_client: reqwest::Client,
@@ -61,21 +70,28 @@ impl RustbloxClient {
         self.roblox_token != None && self.csrf_token != None
     }
 
-    pub(crate) async fn make_request(&self, url: String, method: reqwest::Method, needs_auth: bool) -> Result<reqwest::Response, RequestError> {
-        if needs_auth && self.roblox_token == None {
+    pub(crate) async fn make_request(&self, components: RequestComponents) -> Result<reqwest::Response, RequestError> {
+        if components.needs_auth && self.roblox_token == None {
             return Err(RequestError::NotAuthenticated);
         }
 
-        let mut request = self.reqwest_client.request(method, &url);
-        if needs_auth {
+        let mut request = self.reqwest_client.request(components.method, components.url.clone());
+        if components.needs_auth {
             request = request
                 .header("Cookie", self.roblox_token.as_ref().unwrap())
                 .header("x-csrf-token", self.csrf_token.as_ref().unwrap());
         }
 
+        if components.headers.is_some() {
+            request = request.headers(components.headers.unwrap());
+        }
+        if components.body.is_some() {
+            request = request.body(components.body.unwrap());
+        }
+
         let try_response = request.send().await;
         if let Err(why) = try_response {
-            return Err(RequestError::RequestError(url, why.to_string()));
+            return Err(RequestError::RequestError(components.url, why.to_string()));
         }
         let response = try_response.unwrap();
         Ok(response)
