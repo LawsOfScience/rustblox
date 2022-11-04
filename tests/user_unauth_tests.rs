@@ -30,3 +30,14 @@ async fn get_multiple_ids() {
         client.get_users_from_ids(user_ids, true).await;
     assert!(user_info.is_ok())
 }
+
+#[tokio::test]
+async fn get_multiple_usernames() {
+    let client = create_unauthed_client().await;
+    let usernames = vec!["Aerasto", "TheWildDeveloper", "tannibus"];
+
+    let user_info =
+        client.get_users_from_usernames(usernames, true).await;
+    println!("{:#?}", user_info);
+    assert!(user_info.is_ok());
+}
