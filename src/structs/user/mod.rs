@@ -10,3 +10,12 @@ pub struct UserInfo {
     name: String,
     displayName: String
 }
+
+#[allow(dead_code, non_snake_case)]
+#[derive(Deserialize, Debug)]
+pub struct MinimalUserInfo {
+    displayName: String,
+    hasVerifiedBadge: bool,
+    id: usize,
+    name: String
+}
