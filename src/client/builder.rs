@@ -18,7 +18,11 @@ fn get_user_agent() -> String {
 }
 
 impl RustbloxClientBuilder {
-    /// Attempts to use a `RustbloxClientBuilder` to construct a RustbloxClient. This method will fail if reqwest fails to build a client.
+    /// Attempts to use a `RustbloxClientBuilder` to construct a `RustbloxClient`. This method will fail if reqwest fails to build a client.
+    ///
+    /// # Errors
+    ///
+    /// This function returns an error if the reqwest client builder returns an error.
     pub fn build(self) -> Result<RustbloxClient, ClientError> {
         let built_client = self
             .reqwest_builder
@@ -32,7 +36,11 @@ impl RustbloxClientBuilder {
         })
     }
 
-    /// Inserts a token into a `RustbloxClientBuilder`. Fails if an invalid token is entered.
+    /// Inserts a token into a `RustbloxClientBuilder`.
+    ///
+    /// # Errors
+    ///
+    /// This function returns an error if the cookie provided is invalid.
     pub fn insert_cookie(mut self, cookie: &str) -> Result<Self, ClientError> {
         // All .ROBLOSECURITY cookies should start with this
         // unless Roblox just decides to randomly change it some day
@@ -50,6 +58,7 @@ impl RustbloxClientBuilder {
     }
 
     /// Creates a new `RustbloxClientBuilder`.
+    #[must_use]
     pub fn new() -> Self {
         Self {
             reqwest_builder: reqwest::ClientBuilder::new().user_agent(get_user_agent()),
@@ -57,7 +66,11 @@ impl RustbloxClientBuilder {
         }
     }
 
-    /// Creates a new `RustBloxClientBuilder` with a token. Fails if an invalid token is entered.
+    /// Creates a new `RustBloxClientBuilder` with a token.
+    ///
+    /// # Errors
+    ///
+    /// This function returns an error if the cookie provided is invalid.  
     pub fn with_cookie(cookie: &str) -> Result<Self, ClientError> {
         (!(cookie.starts_with("_|WARNING")))
             .then_some(ClientError::InvalidCookie)
