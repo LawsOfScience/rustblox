@@ -6,6 +6,11 @@ use reqwest::Method;
 const BASE_URL: &str = "https://users.roblox.com/v1";
 
 impl RustbloxClient {
+    /// Gets the info about a user from their user ID.
+    ///
+    /// # Errors
+    ///
+    /// This function returns an error if the request could not be made, or if the endpoint responded with an error.
     pub async fn get_user_info(&self, id: usize) -> Result<UserInfo, RequestError> {
         let url = format!("{}/users/{}", BASE_URL, id);
 
