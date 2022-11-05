@@ -1,8 +1,11 @@
 [package]
 name = "rustblox"
 description = "A Rust library for interacting with the Roblox API"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
+
+[package.metadata]
+msrv = "1.62.1"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
