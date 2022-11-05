@@ -1,7 +1,7 @@
 use reqwest::header::{HeaderMap, HeaderValue};
 use crate::client::RustbloxClient;
 use crate::error::RequestError;
-use crate::structs::user::{UserInfo, MinimalUserInfo, MinimalUserInfoWithRequestedName};
+use crate::structs::user::{UserInfo, MinimalUserInfo, MinimalUserInfoWithRequestedName, UserSearchPage};
 use crate::client::RequestComponents;
 use reqwest::Method;
 
@@ -124,5 +124,38 @@ impl RustbloxClient {
         }
 
         Ok(user_info_vec)
+    }
+
+    pub async fn search_users(&self, username: String, limit: Option<usize>, page_cursor: Option<String>) -> Result<UserSearchPage, RequestError> {
+        let real_limit = if limit.is_some() { limit.unwrap() } else { 10 };
+        let mut url = format!("{}/users/search?keyword={}&limit={}", BASE_URL, username, real_limit);
+        if page_cursor.is_some() {
+            url = format!("{}&cursor={}", url, page_cursor.unwrap());
+        }
+
+        let components = RequestComponents {
+            needs_auth: false,
+            method: Method::GET,
+            url: url.clone(),
+            headers: None,
+            body: None
+        };
+
+        let try_response = self
+            .make_request(components)
+            .await;
+        if let Err(why) = try_response {
+            return Err(RequestError::RequestError(url, why.to_string()));
+        }
+        let try_body_json = try_response
+            .unwrap()
+            .json::<UserSearchPage>()
+            .await;
+        if let Err(why) = try_body_json {
+            return Err(RequestError::RequestError(url, why.to_string()));
+        }
+        let body = try_body_json.unwrap();
+
+        Ok(body)
     }
 }
