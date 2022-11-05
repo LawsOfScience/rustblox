@@ -1,10 +1,11 @@
-use rustblox::client::builder::RustbloxClientBuilder;
-use rustblox::client::RustbloxClient;
+use crate::client::builder::RustbloxClientBuilder;
+use crate::client::RustbloxClient;
 
 async fn create_unauthed_client() -> RustbloxClient {
     let mut client = RustbloxClientBuilder::new()
         .build()
-        .expect("Had an error building the client");
+        .expect("Error building the client");
+
     client.login().await.unwrap();
     client
 }
@@ -17,6 +18,7 @@ async fn get_user_info() {
     if let Err(why) = user_info {
         panic!("Had error getting user info:\n{}", why);
     }
+
     let info = user_info.unwrap();
     println!("{:#?}", info);
 }
