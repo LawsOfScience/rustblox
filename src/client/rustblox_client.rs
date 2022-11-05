@@ -1,5 +1,4 @@
 use crate::error::{ClientError, RequestError};
-use log::{debug, warn};
 
 pub struct RustbloxClient {
     pub(crate) reqwest_client: reqwest::Client,
