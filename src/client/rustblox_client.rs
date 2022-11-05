@@ -8,11 +8,13 @@ pub struct RustbloxClient {
 }
 
 impl RustbloxClient {
+    #[must_use]
     pub fn csrf_token(&self) -> Option<&String> {
         self.csrf_token.as_ref()
     }
 
     /// Returns a boolean representing this [`RustbloxClient`]'s authentication status.
+    #[must_use]
     pub fn is_authenticated(&self) -> bool {
         self.roblox_cookie().is_some() && self.csrf_token.is_some()
     }
@@ -26,6 +28,10 @@ impl RustbloxClient {
     ///     - The provided cookie is invalid.
     ///     - An `x-csrf-token` could not be obtained.
     ///     - An invalid `x-csrf-token` was obtained.
+    ///
+    /// # Panics
+    ///
+    /// This function cannot panic.
     pub async fn login(&mut self) -> Result<(), ClientError> {
         // Initial connection test can come first
         // and return early if no cookie is set
@@ -66,11 +72,7 @@ impl RustbloxClient {
             ))
             .map_or(Ok(()), |e| Err(e))?;
 
-        let csrf_from_headers = auth_response
-            .headers()
-            .get("x-csrf-token")
-            .unwrap()
-            .to_owned();
+        let csrf_from_headers = auth_response.headers().get("x-csrf-token").unwrap().clone();
 
         let csrf_string = csrf_from_headers
             .to_str()
@@ -121,6 +123,7 @@ impl RustbloxClient {
     }
 
     /// Returns the roblox cookie of this [`RustbloxClient`].
+    #[must_use]
     pub fn roblox_cookie(&self) -> Option<&String> {
         self.roblox_cookie.as_ref()
     }
