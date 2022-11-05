@@ -1,5 +1,5 @@
 /target
 /Cargo.lock
 .idea/
-token.txt
+/resources/private
 .DS_Store
