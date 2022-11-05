@@ -65,22 +65,4 @@ impl RustbloxClientBuilder {
             roblox_cookie: None,
         }
     }
-
-    /// Creates a new `RustBloxClientBuilder` with a token.
-    ///
-    /// # Errors
-    ///
-    /// This function returns an error if the cookie provided is invalid.  
-    pub fn with_cookie(cookie: &str) -> Result<Self, ClientError> {
-        (!(cookie.starts_with("_|WARNING")))
-            .then_some(ClientError::InvalidCookie)
-            .map_or(Ok(()), |e| Err(e))?;
-
-        let formatted_cookie = format!(".ROBLOSECURITY={cookie}");
-
-        Ok(Self {
-            reqwest_builder: reqwest::ClientBuilder::new().user_agent(get_user_agent()),
-            roblox_cookie: Some(formatted_cookie),
-        })
-    }
 }
