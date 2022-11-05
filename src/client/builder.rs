@@ -48,7 +48,7 @@ impl RustbloxClientBuilder {
 
         (!(cookie.starts_with("_|WARNING")))
             .then_some(ClientError::InvalidCookie)
-            .map_or(Ok(()), |e| Err(e))?;
+            .map_or(Ok(()), Err)?;
 
         let formatted_cookie = format!(".ROBLOSECURITY={cookie}");
 
@@ -74,7 +74,7 @@ impl RustbloxClientBuilder {
     pub fn with_cookie(cookie: &str) -> Result<Self, ClientError> {
         (!(cookie.starts_with("_|WARNING")))
             .then_some(ClientError::InvalidCookie)
-            .map_or(Ok(()), |e| Err(e))?;
+            .map_or(Ok(()), Err)?;
 
         let formatted_cookie = format!(".ROBLOSECURITY={cookie}");
 

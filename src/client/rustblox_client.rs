@@ -64,13 +64,13 @@ impl RustbloxClient {
 
         (auth_response.status() != 403)
             .then_some(ClientError::InvalidCookie)
-            .map_or(Ok(()), |e| Err(e))?;
+            .map_or(Ok(()), Err)?;
 
         std::ops::Not::not(auth_response.headers().contains_key("x-csrf-token"))
             .then_some(ClientError::LoginFailed(
                 "No x-csrf-token was given by Roblox".to_string(),
             ))
-            .map_or(Ok(()), |e| Err(e))?;
+            .map_or(Ok(()), Err)?;
 
         let csrf_from_headers = auth_response.headers().get("x-csrf-token").unwrap().clone();
 
@@ -104,7 +104,7 @@ impl RustbloxClient {
     ) -> Result<reqwest::Response, RequestError> {
         (needs_auth && self.roblox_cookie().is_none())
             .then_some(RequestError::NotAuthenticated)
-            .map_or(Ok(()), |e| Err(e))?;
+            .map_or(Ok(()), Err)?;
 
         let mut request = self.reqwest_client.request(method, &url);
 
