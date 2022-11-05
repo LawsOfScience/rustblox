@@ -7,11 +7,6 @@ pub struct RustbloxClient {
 }
 
 impl RustbloxClient {
-    #[must_use]
-    pub fn csrf_token(&self) -> Option<&String> {
-        self.csrf_token.as_ref()
-    }
-
     /// Returns a boolean representing this [`RustbloxClient`]'s authentication status.
     #[must_use]
     pub fn is_authenticated(&self) -> bool {
