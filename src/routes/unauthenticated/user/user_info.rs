@@ -20,6 +20,11 @@ struct MinimalUserInfoWithReqdObject {
 }
 
 impl RustbloxClient {
+    /// Gets the info about a user from their user ID.
+    ///
+    /// # Errors
+    ///
+    /// This function returns an error if the request could not be made, or if the endpoint responded with an error.
     pub async fn get_user_info(&self, id: usize) -> Result<UserInfo, RequestError> {
         let url = format!("{}/users/{}", BASE_URL, id);
         let components = RequestComponents {
@@ -33,13 +38,12 @@ impl RustbloxClient {
         let response = self
             .make_request(components)
             .await?;
-        let try_user_info = response
+        let user_info = response
             .json::<UserInfo>()
-            .await;
-        if try_user_info.is_err() {
-            return Err(RequestError::RequestError(url, "Had error parsing data".to_string()));
-        }
-        Ok(try_user_info.unwrap())
+            .await
+            .map_err(|e| RequestError::RequestError(url, e.to_string()))?;
+
+        Ok(user_info)
     }
 
     pub async fn get_users_from_ids(&self, ids: Vec<usize>, exclude_banned: bool) -> Result<Vec<MinimalUserInfo>, RequestError> {

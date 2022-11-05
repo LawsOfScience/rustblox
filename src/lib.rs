@@ -10,3 +10,6 @@ pub mod error;
 pub mod structs;
 
 mod routes;
+
+#[cfg(test)]
+mod tests;
