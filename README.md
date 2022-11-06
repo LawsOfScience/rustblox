@@ -20,6 +20,9 @@ TBD
 
 Will most likely work by creating a `RustbloxClient` and interacting with that.
 
+## MSRV (Minimum Supported Rust Version)
+The current MSRV is 1.62.1.
+
 ## Notes
 
 ### .ROBLOSECURITY Cookies

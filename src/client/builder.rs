@@ -2,9 +2,8 @@ use crate::client::RustbloxClient;
 use crate::error::ClientError;
 
 pub struct RustbloxClientBuilder {
-    error: Option<ClientError>,
     reqwest_builder: reqwest::ClientBuilder,
-    roblox_token: Option<String>,
+    roblox_cookie: Option<String>,
 }
 
 impl Default for RustbloxClientBuilder {
@@ -13,44 +12,57 @@ impl Default for RustbloxClientBuilder {
     }
 }
 
-impl RustbloxClientBuilder {
-    pub fn new() -> Self {
-        RustbloxClientBuilder {
-            error: None,
-            reqwest_builder: reqwest::ClientBuilder::new().user_agent("Rustblox v0.0.1"),
-            roblox_token: None,
-        }
-    }
+#[inline]
+fn get_user_agent() -> String {
+    format!("Rustblox v{}", env!("CARGO_PKG_VERSION"))
+}
 
+impl RustbloxClientBuilder {
+    /// Attempts to use a `RustbloxClientBuilder` to construct a `RustbloxClient`. This method will fail if reqwest fails to build a client.
+    ///
+    /// # Errors
+    ///
+    /// This function returns an error if the reqwest client builder returns an error.
     pub fn build(self) -> Result<RustbloxClient, ClientError> {
-        if let Some(error) = self.error {
-            return Err(error);
-        }
-        let built_client = match self.reqwest_builder.build() {
-            Ok(reqwest_client) => reqwest_client,
-            Err(err) => {
-                return Err(ClientError::ReqwestBuildError(err.to_string()));
-            }
-        };
+        let built_client = self
+            .reqwest_builder
+            .build()
+            .map_err(|e| ClientError::ReqwestBuildError(e.to_string()))?;
 
         Ok(RustbloxClient {
             reqwest_client: built_client,
-            roblox_token: self.roblox_token,
-            csrf_token: None
+            roblox_cookie: self.roblox_cookie,
+            csrf_token: None,
         })
     }
 
-    pub fn with_token(mut self, token: &str) -> Self {
+    /// Inserts a token into a `RustbloxClientBuilder`.
+    ///
+    /// # Errors
+    ///
+    /// This function returns an error if the cookie provided is invalid.
+    pub fn insert_cookie(mut self, cookie: &str) -> Result<Self, ClientError> {
         // All .ROBLOSECURITY cookies should start with this
         // unless Roblox just decides to randomly change it some day
         // ...which they might
-        if !token.starts_with("_|WARNING") {
-            self.error = Some(ClientError::InvalidToken);
-            return self;
-        }
 
-        let formatted_token = format!(".ROBLOSECURITY={}", token);
-        self.roblox_token = Some(formatted_token);
-        self
+        (!(cookie.starts_with("_|WARNING")))
+            .then_some(ClientError::InvalidCookie)
+            .map_or(Ok(()), Err)?;
+
+        let formatted_cookie = format!(".ROBLOSECURITY={cookie}");
+
+        self.roblox_cookie = Some(formatted_cookie);
+
+        Ok(self)
+    }
+
+    /// Creates a new `RustbloxClientBuilder`.
+    #[must_use]
+    pub fn new() -> Self {
+        Self {
+            reqwest_builder: reqwest::ClientBuilder::new().user_agent(get_user_agent()),
+            roblox_cookie: None,
+        }
     }
 }

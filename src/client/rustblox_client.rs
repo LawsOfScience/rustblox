@@ -1,22 +1,59 @@
 use crate::error::{ClientError, RequestError};
-use log::{warn, debug};
+use reqwest::header::HeaderMap;
+use reqwest::Method;
+use serde::de::DeserializeOwned;
+
+pub(crate) struct RequestComponents {
+    pub(crate) needs_auth: bool,
+    pub(crate) method: Method,
+    pub(crate) url: String,
+    pub(crate) headers: Option<HeaderMap>,
+    pub(crate) body: Option<String>,
+}
 
 pub struct RustbloxClient {
     pub(crate) reqwest_client: reqwest::Client,
-    pub(crate) roblox_token: Option<String>,
+    pub(crate) roblox_cookie: Option<String>,
     pub(crate) csrf_token: Option<String>,
 }
 
 impl RustbloxClient {
+    #[must_use]
+    pub fn csrf_token(&self) -> Option<&String> {
+        self.csrf_token.as_ref()
+    }
+
+    /// Returns a boolean representing this [`RustbloxClient`]'s authentication status.
+    #[must_use]
+    pub fn is_authenticated(&self) -> bool {
+        self.roblox_cookie().is_some() && self.csrf_token.is_some()
+    }
+
+    /// Logs the client in.
+    ///
+    /// # Errors
+    ///
+    /// This function will return an error if:
+    ///     - The login process failed.
+    ///     - The provided cookie is invalid.
+    ///     - An `x-csrf-token` could not be obtained.
+    ///     - An invalid `x-csrf-token` was obtained.
+    ///
+    /// # Panics
+    ///
+    /// This function cannot panic.
     pub async fn login(&mut self) -> Result<(), ClientError> {
         // Initial connection test can come first
         // and return early if no cookie is set
-        if self.reqwest_client.get("https://roblox.com").send().await.is_err() {
-            return Err(ClientError::LoginFailed("Could not ping roblox.com".to_string()));
-        }
+        self.reqwest_client
+            .get("https://roblox.com")
+            .send()
+            .await
+            .map_err(|e| ClientError::LoginFailed(format!("Could not reach roblox.com ({e})")))?;
+
         debug!("Successfully pinged Roblox");
 
-        if self.roblox_token.is_none() {
+        if self.roblox_cookie().is_none() {
             warn!(
                 "[WARN/LOGIN]: Please be advised that you do not have a .ROBLOSECURITY cookie set.\
                 \nYou will not be able to use functions that require this."
@@ -24,60 +61,94 @@ impl RustbloxClient {
             return Ok(()); // Return early
         }
 
-        let auth_attempt = self.reqwest_client
+        let auth_response = self
+            .reqwest_client
             .post("https://auth.roblox.com/v2/logout")
             .header("Content-Length", 0)
-            .header("Cookie", self.roblox_token.as_ref().unwrap())
+            .header("Cookie", self.roblox_cookie().unwrap())
             .send()
-            .await;
-        if let Err(why) = auth_attempt {
-            let message = format!("Authentication request errored:\n{}", why);
-            return Err(ClientError::LoginFailed(message));
-        }
+            .await
+            .map_err(|e| {
+                ClientError::LoginFailed(format!("Authentication request error: \n{e}"))
+            })?;
 
-        let auth_response = auth_attempt.unwrap();
-        if auth_response.status() != 403 {
-            return Err(ClientError::InvalidToken);
-        }
-        if !auth_response.headers().contains_key("x-csrf-token") {
-            return Err(ClientError::LoginFailed("No x-csrf-token was given by Roblox".to_string()));
-        }
-        let csrf_from_headers = auth_response
-            .headers()
-            .get("x-csrf-token")
-            .unwrap()
-            .to_owned();
-        let try_csrf_str = csrf_from_headers.to_str();
-        if let Err(why) = try_csrf_str {
-            let message = format!("Had error parsing the CSRF token as a str:\n{}", why);
-            return Err(ClientError::LoginFailed(message));
-        }
-        self.csrf_token = Some(try_csrf_str.unwrap().to_string());
+        (auth_response.status() != 403)
+            .then_some(ClientError::InvalidCookie)
+            .map_or(Ok(()), Err)?;
+
+        std::ops::Not::not(auth_response.headers().contains_key("x-csrf-token"))
+            .then_some(ClientError::LoginFailed(
+                "No x-csrf-token was given by Roblox".to_string(),
+            ))
+            .map_or(Ok(()), Err)?;
+
+        let csrf_from_headers = auth_response.headers().get("x-csrf-token").unwrap().clone();
+
+        let csrf_string = csrf_from_headers
+            .to_str()
+            .map_err(|e| ClientError::LoginFailed(format!("Failed to parse CSRF token:\n{e}")))?
+            .to_string();
+
+        self.csrf_token = Some(csrf_string);
 
         Ok(())
     }
 
-    pub fn is_authenticated(&self) -> bool {
-        self.roblox_token != None && self.csrf_token != None
+    /// Makes a request to the Roblox API.
+    ///
+    /// # Panics
+    ///
+    /// Panics if:
+    ///     - An `x-csrf-token` could not be obtained.
+    ///
+    /// # Errors
+    ///
+    /// This function will return an error if:
+    ///     - You attempt to contact an endpoint that requires authentication while unauthenticated
+    ///     - The endpoint responds with an error.
+    pub(crate) async fn make_request<T>(
+        &self,
+        components: RequestComponents,
+    ) -> Result<T, RequestError>
+    where
+        T: DeserializeOwned,
+    {
+        (components.needs_auth && self.roblox_cookie().is_none())
+            .then_some(RequestError::NotAuthenticated)
+            .map_or(Ok(()), Err)?;
+
+        let mut request = self
+            .reqwest_client
+            .request(components.method, components.url.clone());
+        if components.needs_auth {
+            request = request
+                .header("Cookie", self.roblox_cookie().unwrap())
+                .header("x-csrf-token", self.csrf_token().unwrap());
+        }
+
+        if components.headers.is_some() {
+            request = request.headers(components.headers.unwrap());
+        }
+        if components.body.is_some() {
+            request = request.body(components.body.unwrap());
+        }
+
+        let response = request
+            .send()
+            .await
+            .map_err(|e| RequestError::RequestError(components.url.clone(), e.to_string()))?;
+
+        let response_data = response
+            .json::<T>()
+            .await
+            .map_err(|e| RequestError::RequestError(components.url, e.to_string()))?;
+
+        Ok(response_data)
     }
 
-    pub(crate) async fn make_request(&self, url: String, method: reqwest::Method, needs_auth: bool) -> Result<reqwest::Response, RequestError> {
-        if needs_auth && self.roblox_token == None {
-            return Err(RequestError::NotAuthenticated);
-        }
-
-        let mut request = self.reqwest_client.request(method, &url);
-        if needs_auth {
-            request = request
-                .header("Cookie", self.roblox_token.as_ref().unwrap())
-                .header("x-csrf-token", self.csrf_token.as_ref().unwrap());
-        }
-
-        let try_response = request.send().await;
-        if let Err(why) = try_response {
-            return Err(RequestError::RequestError(url, why.to_string()));
-        }
-        let response = try_response.unwrap();
-        Ok(response)
+    /// Returns the roblox cookie of this [`RustbloxClient`].
+    #[must_use]
+    pub fn roblox_cookie(&self) -> Option<&String> {
+        self.roblox_cookie.as_ref()
     }
 }
