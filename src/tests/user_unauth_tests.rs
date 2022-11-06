@@ -30,7 +30,12 @@ async fn get_multiple_ids() {
 
     let user_info =
         client.get_users_from_ids(user_ids, true).await;
-    assert!(user_info.is_ok())
+    if let Err(why) = user_info {
+        panic!("Had error getting user info:\n{}", why);
+    }
+
+    let info = user_info.unwrap();
+    println!("{:#?}", info);
 }
 
 #[tokio::test]
@@ -40,6 +45,24 @@ async fn get_multiple_usernames() {
 
     let user_info =
         client.get_users_from_usernames(usernames, true).await;
-    println!("{:#?}", user_info);
-    assert!(user_info.is_ok());
+    if let Err(why) = user_info {
+        panic!("Had error getting user info:\n{}", why);
+    }
+
+    let info = user_info.unwrap();
+    println!("{:#?}", info);
+}
+
+#[tokio::test]
+async fn search_user() {
+    let client = create_unauthed_client().await;
+
+    let user_info =
+        client.search_user("TheWildDeveloper".to_string(), None, None).await;
+    if let Err(why) = user_info {
+        panic!("Had error getting user info:\n{}", why);
+    }
+
+    let info = user_info.unwrap();
+    println!("{:#?}", info);
 }

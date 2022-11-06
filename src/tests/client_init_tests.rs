@@ -32,7 +32,8 @@ async fn build_and_login() {
 
 #[tokio::test]
 async fn build_and_login_new() {
-    let mut client = RustbloxClientBuilder::with_cookie(&get_cookie())
+    let mut client = RustbloxClientBuilder::new()
+        .insert_cookie(&get_cookie())
         .expect("Invalid cookie")
         .build()
         .expect("Had an error building the client");

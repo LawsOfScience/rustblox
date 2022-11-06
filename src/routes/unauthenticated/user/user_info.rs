@@ -35,11 +35,17 @@ impl RustbloxClient {
             body: None
         };
 
+        /*
         let response = self
             .make_request(components)
             .await?;
         let user_info = response
             .json::<UserInfo>()
+            .await
+            .map_err(|e| RequestError::RequestError(url, e.to_string()))?;
+        */
+        let user_info = self
+            .make_request::<UserInfo>(components)
             .await
             .map_err(|e| RequestError::RequestError(url, e.to_string()))?;
 
@@ -66,22 +72,13 @@ impl RustbloxClient {
             body: Some(data_json.to_string())
         };
 
-        let try_response = self
-            .make_request(components)
-            .await;
-        if let Err(why) = try_response {
-            return Err(RequestError::RequestError(url, why.to_string()));
-        }
-        let try_body_json = try_response
-            .unwrap()
-            .json::<MinimalUserInfoObject>()
-            .await;
-        if let Err(why) = try_body_json {
-            return Err(RequestError::RequestError(url, why.to_string()));
-        }
-        let body = try_body_json.unwrap();
+        let response = self
+            .make_request::<MinimalUserInfoObject>(components)
+            .await
+            .map_err(|e| RequestError::RequestError(url, e.to_string()))?;
+
         let mut user_info_vec: Vec<MinimalUserInfo> = Vec::new();
-        for minimal_user in body.data {
+        for minimal_user in response.data {
             user_info_vec.push(minimal_user);
         }
 
@@ -108,29 +105,20 @@ impl RustbloxClient {
             body: Some(data_json.to_string())
         };
 
-        let try_response = self
-            .make_request(components)
-            .await;
-        if let Err(why) = try_response {
-            return Err(RequestError::RequestError(url, why.to_string()));
-        }
-        let try_body_json = try_response
-            .unwrap()
-            .json::<MinimalUserInfoWithReqdObject>()
-            .await;
-        if let Err(why) = try_body_json {
-            return Err(RequestError::RequestError(url, why.to_string()));
-        }
-        let body = try_body_json.unwrap();
+        let response = self
+            .make_request::<MinimalUserInfoWithReqdObject>(components)
+            .await
+            .map_err(|e| RequestError::RequestError(url, e.to_string()))?;
+
         let mut user_info_vec: Vec<MinimalUserInfoWithRequestedName> = Vec::new();
-        for minimal_user in body.data {
+        for minimal_user in response.data {
             user_info_vec.push(minimal_user);
         }
 
         Ok(user_info_vec)
     }
 
-    pub async fn search_users(&self, username: String, limit: Option<usize>, page_cursor: Option<String>) -> Result<UserSearchPage, RequestError> {
+    pub async fn search_user(&self, username: String, limit: Option<usize>, page_cursor: Option<String>) -> Result<UserSearchPage, RequestError> {
         let real_limit = if limit.is_some() { limit.unwrap() } else { 10 };
         let mut url = format!("{}/users/search?keyword={}&limit={}", BASE_URL, username, real_limit);
         if page_cursor.is_some() {
@@ -145,21 +133,11 @@ impl RustbloxClient {
             body: None
         };
 
-        let try_response = self
-            .make_request(components)
-            .await;
-        if let Err(why) = try_response {
-            return Err(RequestError::RequestError(url, why.to_string()));
-        }
-        let try_body_json = try_response
-            .unwrap()
-            .json::<UserSearchPage>()
-            .await;
-        if let Err(why) = try_body_json {
-            return Err(RequestError::RequestError(url, why.to_string()));
-        }
-        let body = try_body_json.unwrap();
+        let response = self
+            .make_request::<UserSearchPage>(components)
+            .await
+            .map_err(|e| RequestError::RequestError(url, e.to_string()))?;
 
-        Ok(body)
+        Ok(response)
     }
 }
