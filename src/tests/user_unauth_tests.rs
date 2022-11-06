@@ -29,8 +29,7 @@ async fn get_multiple_ids() {
     let client = create_unauthed_client().await;
     let user_ids = vec![68429027, 665352667, 165383308, 203539400];
 
-    let user_info =
-        client.get_users_from_ids(user_ids, true).await;
+    let user_info = client.get_users_from_ids(user_ids, true).await;
     if let Err(why) = user_info {
         panic!("Had error getting user info:\n{}", why);
     }
@@ -44,8 +43,7 @@ async fn get_multiple_usernames() {
     let client = create_unauthed_client().await;
     let usernames = vec!["Aerasto", "TheWildDeveloper", "tannibus"];
 
-    let user_info =
-        client.get_users_from_usernames(usernames, true).await;
+    let user_info = client.get_users_from_usernames(usernames, true).await;
     if let Err(why) = user_info {
         panic!("Had error getting user info:\n{}", why);
     }
@@ -58,8 +56,9 @@ async fn get_multiple_usernames() {
 async fn get_previous_usernames() {
     let client = create_unauthed_client().await;
 
-    let previous_usernames =
-        client.get_previous_usernames(68429027, None, None, Some(SortOrder::Descending)).await;
+    let previous_usernames = client
+        .get_previous_usernames(68429027, None, None, Some(SortOrder::Descending))
+        .await;
     if let Err(why) = previous_usernames {
         panic!("Had error getting previous usernames:\n{why}");
     }
@@ -72,8 +71,9 @@ async fn get_previous_usernames() {
 async fn search_user() {
     let client = create_unauthed_client().await;
 
-    let user_info =
-        client.search_user("TheWildDeveloper".to_string(), None, None).await;
+    let user_info = client
+        .search_user("TheWildDeveloper".to_string(), None, None)
+        .await;
     if let Err(why) = user_info {
         panic!("Had error getting user info:\n{}", why);
     }

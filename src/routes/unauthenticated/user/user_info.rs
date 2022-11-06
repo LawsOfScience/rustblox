@@ -1,29 +1,31 @@
-use reqwest::header::{HeaderMap, HeaderValue};
+use crate::client::RequestComponents;
 use crate::client::RustbloxClient;
 use crate::error::RequestError;
-use crate::structs::user::{UserInfo, MinimalUserInfo, MinimalUserInfoWithRequestedName, UserSearchPage};
-use crate::client::RequestComponents;
-use reqwest::Method;
 use crate::structs::requests::SortOrder;
+use crate::structs::user::{
+    MinimalUserInfo, MinimalUserInfoWithRequestedName, UserInfo, UserSearchPage,
+};
+use reqwest::header::{HeaderMap, HeaderValue};
+use reqwest::Method;
 
 const BASE_URL: &str = "https://users.roblox.com/v1";
 
 #[allow(dead_code)]
 #[derive(Deserialize, Debug)]
 struct MinimalUserInfoObject {
-    data: Vec<MinimalUserInfo>
+    data: Vec<MinimalUserInfo>,
 }
 
 #[allow(dead_code)]
 #[derive(Deserialize, Debug)]
 struct MinimalUserInfoWithReqdObject {
-    data: Vec<MinimalUserInfoWithRequestedName>
+    data: Vec<MinimalUserInfoWithRequestedName>,
 }
 
 #[allow(dead_code, non_snake_case)]
 #[derive(Deserialize, Debug)]
 struct PreviousUsername {
-    name: String
+    name: String,
 }
 
 #[allow(dead_code, non_snake_case)]
@@ -34,14 +36,19 @@ struct PreviousUsernamesPage {
     data: Vec<PreviousUsername>,
 }
 
-
 impl RustbloxClient {
     /// Gets a user's previous usernames, given their user ID.
     ///
     /// # Errors
     ///
     /// This function returns an error if the request could not be made, or if the endpoint responded with an error.
-    pub async fn get_previous_usernames(&self, id: usize, limit: Option<usize>, cursor: Option<String>, sort_order: Option<SortOrder>) -> Result <Vec<String>, RequestError> {
+    pub async fn get_previous_usernames(
+        &self,
+        id: usize,
+        limit: Option<usize>,
+        cursor: Option<String>,
+        sort_order: Option<SortOrder>,
+    ) -> Result<Vec<String>, RequestError> {
         let real_limit = if limit.is_some() { limit.unwrap() } else { 10 };
         let mut url = format!("{BASE_URL}/users/{id}/username-history?limit={real_limit}");
         if cursor.is_some() {
@@ -50,7 +57,7 @@ impl RustbloxClient {
         if sort_order.is_some() {
             match sort_order.unwrap() {
                 SortOrder::Ascending => url = format!("{url}&sortOrder=Asc"),
-                SortOrder::Descending => url = format!("{url}&sortOrder=Desc")
+                SortOrder::Descending => url = format!("{url}&sortOrder=Desc"),
             }
         }
 
@@ -59,7 +66,7 @@ impl RustbloxClient {
             method: Method::GET,
             url: url.clone(),
             headers: None,
-            body: None
+            body: None,
         };
 
         let previous_usernames_data = self
@@ -85,7 +92,7 @@ impl RustbloxClient {
             method: Method::GET,
             url: url.clone(),
             headers: None,
-            body: None
+            body: None,
         };
 
         let user_info = self
@@ -96,7 +103,11 @@ impl RustbloxClient {
         Ok(user_info)
     }
 
-    pub async fn get_users_from_ids(&self, ids: Vec<usize>, exclude_banned: bool) -> Result<Vec<MinimalUserInfo>, RequestError> {
+    pub async fn get_users_from_ids(
+        &self,
+        ids: Vec<usize>,
+        exclude_banned: bool,
+    ) -> Result<Vec<MinimalUserInfo>, RequestError> {
         let url = format!("{}/users", BASE_URL);
         let data_json = json!({
             "userIds": ids,
@@ -106,14 +117,17 @@ impl RustbloxClient {
 
         let mut headers = HeaderMap::new();
         headers.insert("Content-Length", HeaderValue::from(data_size));
-        headers.insert("Content-Type", HeaderValue::from_str("application/json").unwrap());
+        headers.insert(
+            "Content-Type",
+            HeaderValue::from_str("application/json").unwrap(),
+        );
 
         let components = RequestComponents {
             needs_auth: false,
             method: Method::POST,
             url: url.clone(),
             headers: Some(headers),
-            body: Some(data_json.to_string())
+            body: Some(data_json.to_string()),
         };
 
         let response = self
@@ -129,7 +143,11 @@ impl RustbloxClient {
         Ok(user_info_vec)
     }
 
-    pub async fn get_users_from_usernames(&self, usernames: Vec<&str>, exclude_banned: bool) -> Result<Vec<MinimalUserInfoWithRequestedName>, RequestError> {
+    pub async fn get_users_from_usernames(
+        &self,
+        usernames: Vec<&str>,
+        exclude_banned: bool,
+    ) -> Result<Vec<MinimalUserInfoWithRequestedName>, RequestError> {
         let url = format!("{}/usernames/users", BASE_URL);
         let data_json = json!({
             "usernames": usernames,
@@ -139,14 +157,17 @@ impl RustbloxClient {
 
         let mut headers = HeaderMap::new();
         headers.insert("Content-Length", HeaderValue::from(data_size));
-        headers.insert("Content-Type", HeaderValue::from_str("application/json").unwrap());
+        headers.insert(
+            "Content-Type",
+            HeaderValue::from_str("application/json").unwrap(),
+        );
 
         let components = RequestComponents {
             needs_auth: false,
             method: Method::POST,
             url: url.clone(),
             headers: Some(headers),
-            body: Some(data_json.to_string())
+            body: Some(data_json.to_string()),
         };
 
         let response = self
@@ -162,9 +183,17 @@ impl RustbloxClient {
         Ok(user_info_vec)
     }
 
-    pub async fn search_user(&self, username: String, limit: Option<usize>, page_cursor: Option<String>) -> Result<UserSearchPage, RequestError> {
+    pub async fn search_user(
+        &self,
+        username: String,
+        limit: Option<usize>,
+        page_cursor: Option<String>,
+    ) -> Result<UserSearchPage, RequestError> {
         let real_limit = if limit.is_some() { limit.unwrap() } else { 10 };
-        let mut url = format!("{}/users/search?keyword={}&limit={}", BASE_URL, username, real_limit);
+        let mut url = format!(
+            "{}/users/search?keyword={}&limit={}",
+            BASE_URL, username, real_limit
+        );
         if page_cursor.is_some() {
             url = format!("{}&cursor={}", url, page_cursor.unwrap());
         }
@@ -174,7 +203,7 @@ impl RustbloxClient {
             method: Method::GET,
             url: url.clone(),
             headers: None,
-            body: None
+            body: None,
         };
 
         let response = self

@@ -8,7 +8,7 @@ pub struct UserInfo {
     hasVerifiedBadge: bool,
     id: usize,
     name: String,
-    displayName: String
+    displayName: String,
 }
 
 #[allow(dead_code, non_snake_case)]
@@ -17,7 +17,7 @@ pub struct MinimalUserInfo {
     displayName: String,
     hasVerifiedBadge: bool,
     id: usize,
-    name: String
+    name: String,
 }
 
 #[allow(dead_code, non_snake_case)]
@@ -27,7 +27,7 @@ pub struct MinimalUserInfoWithRequestedName {
     displayName: String,
     hasVerifiedBadge: bool,
     id: usize,
-    name: String
+    name: String,
 }
 
 #[allow(dead_code, non_snake_case)]
@@ -37,7 +37,7 @@ pub struct MinimalUserInfoWithPreviousNames {
     displayName: String,
     hasVerifiedBadge: bool,
     id: usize,
-    name: String
+    name: String,
 }
 
 #[allow(dead_code, non_snake_case)]
@@ -45,5 +45,5 @@ pub struct MinimalUserInfoWithPreviousNames {
 pub struct UserSearchPage {
     previousPageCursor: Option<String>,
     nextPageCursor: Option<String>,
-    data: Vec<MinimalUserInfoWithPreviousNames>
+    data: Vec<MinimalUserInfoWithPreviousNames>,
 }

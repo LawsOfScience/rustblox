@@ -1,14 +1,14 @@
+use crate::error::{ClientError, RequestError};
 use reqwest::header::HeaderMap;
 use reqwest::Method;
 use serde::de::DeserializeOwned;
-use crate::error::{ClientError, RequestError};
 
 pub(crate) struct RequestComponents {
     pub(crate) needs_auth: bool,
     pub(crate) method: Method,
     pub(crate) url: String,
     pub(crate) headers: Option<HeaderMap>,
-    pub(crate) body: Option<String>
+    pub(crate) body: Option<String>,
 }
 
 pub struct RustbloxClient {
@@ -106,13 +106,20 @@ impl RustbloxClient {
     /// This function will return an error if:
     ///     - You attempt to contact an endpoint that requires authentication while unauthenticated
     ///     - The endpoint responds with an error.
-    pub(crate) async fn make_request<T>(&self, components: RequestComponents) -> Result<T, RequestError>
-        where T: DeserializeOwned {
+    pub(crate) async fn make_request<T>(
+        &self,
+        components: RequestComponents,
+    ) -> Result<T, RequestError>
+    where
+        T: DeserializeOwned,
+    {
         (components.needs_auth && self.roblox_cookie().is_none())
             .then_some(RequestError::NotAuthenticated)
             .map_or(Ok(()), Err)?;
 
-        let mut request = self.reqwest_client.request(components.method, components.url.clone());
+        let mut request = self
+            .reqwest_client
+            .request(components.method, components.url.clone());
         if components.needs_auth {
             request = request
                 .header("Cookie", self.roblox_cookie().unwrap())
