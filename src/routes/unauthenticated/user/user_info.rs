@@ -4,6 +4,7 @@ use crate::error::RequestError;
 use crate::structs::user::{UserInfo, MinimalUserInfo, MinimalUserInfoWithRequestedName, UserSearchPage};
 use crate::client::RequestComponents;
 use reqwest::Method;
+use crate::structs::requests::SortOrder;
 
 const BASE_URL: &str = "https://users.roblox.com/v1";
 
@@ -19,7 +20,59 @@ struct MinimalUserInfoWithReqdObject {
     data: Vec<MinimalUserInfoWithRequestedName>
 }
 
+#[allow(dead_code, non_snake_case)]
+#[derive(Deserialize, Debug)]
+struct PreviousUsername {
+    name: String
+}
+
+#[allow(dead_code, non_snake_case)]
+#[derive(Deserialize, Debug)]
+struct PreviousUsernamesPage {
+    previousPageCursor: Option<String>,
+    nextPageCursor: Option<String>,
+    data: Vec<PreviousUsername>,
+}
+
+
 impl RustbloxClient {
+    /// Gets a user's previous usernames, given their user ID.
+    ///
+    /// # Errors
+    ///
+    /// This function returns an error if the request could not be made, or if the endpoint responded with an error.
+    pub async fn get_previous_usernames(&self, id: usize, limit: Option<usize>, cursor: Option<String>, sort_order: Option<SortOrder>) -> Result <Vec<String>, RequestError> {
+        let real_limit = if limit.is_some() { limit.unwrap() } else { 10 };
+        let mut url = format!("{BASE_URL}/users/{id}/username-history?limit={real_limit}");
+        if cursor.is_some() {
+            url = format!("{url}&cursor={}", cursor.unwrap());
+        }
+        if sort_order.is_some() {
+            match sort_order.unwrap() {
+                SortOrder::Ascending => url = format!("{url}&sortOrder=Asc"),
+                SortOrder::Descending => url = format!("{url}&sortOrder=Desc")
+            }
+        }
+
+        let components = RequestComponents {
+            needs_auth: false,
+            method: Method::GET,
+            url: url.clone(),
+            headers: None,
+            body: None
+        };
+
+        let previous_usernames_data = self
+            .make_request::<PreviousUsernamesPage>(components)
+            .await
+            .map_err(|e| RequestError::RequestError(url, e.to_string()))?;
+        let mut previous_usernames: Vec<String> = Vec::new();
+        for username in previous_usernames_data.data {
+            previous_usernames.push(username.name)
+        }
+
+        Ok(previous_usernames)
+    }
     /// Gets the info about a user from their user ID.
     ///
     /// # Errors
@@ -35,15 +88,6 @@ impl RustbloxClient {
             body: None
         };
 
-        /*
-        let response = self
-            .make_request(components)
-            .await?;
-        let user_info = response
-            .json::<UserInfo>()
-            .await
-            .map_err(|e| RequestError::RequestError(url, e.to_string()))?;
-        */
         let user_info = self
             .make_request::<UserInfo>(components)
             .await

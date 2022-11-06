@@ -1,5 +1,6 @@
 use crate::client::builder::RustbloxClientBuilder;
 use crate::client::RustbloxClient;
+use crate::structs::requests::SortOrder;
 
 async fn create_unauthed_client() -> RustbloxClient {
     let mut client = RustbloxClientBuilder::new()
@@ -50,6 +51,20 @@ async fn get_multiple_usernames() {
     }
 
     let info = user_info.unwrap();
+    println!("{:#?}", info);
+}
+
+#[tokio::test]
+async fn get_previous_usernames() {
+    let client = create_unauthed_client().await;
+
+    let previous_usernames =
+        client.get_previous_usernames(68429027, None, None, Some(SortOrder::Descending)).await;
+    if let Err(why) = previous_usernames {
+        panic!("Had error getting previous usernames:\n{why}");
+    }
+
+    let info = previous_usernames.unwrap();
     println!("{:#?}", info);
 }
 
