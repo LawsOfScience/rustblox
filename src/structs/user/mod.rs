@@ -1,49 +1,49 @@
 #[allow(dead_code, non_snake_case)]
 #[derive(Deserialize, Debug)]
 pub struct UserInfo {
-    description: String,
-    created: String,
-    isBanned: bool,
-    externalAppDisplayName: Option<String>,
-    hasVerifiedBadge: bool,
-    id: usize,
-    name: String,
-    displayName: String,
+    pub description: String,
+    pub created: String,
+    pub isBanned: bool,
+    pub externalAppDisplayName: Option<String>,
+    pub hasVerifiedBadge: bool,
+    pub id: usize,
+    pub name: String,
+    pub displayName: String,
 }
 
 #[allow(dead_code, non_snake_case)]
 #[derive(Deserialize, Debug)]
 pub struct MinimalUserInfo {
-    displayName: String,
-    hasVerifiedBadge: bool,
-    id: usize,
-    name: String,
+    pub displayName: String,
+    pub hasVerifiedBadge: bool,
+    pub id: usize,
+    pub name: String,
 }
 
 #[allow(dead_code, non_snake_case)]
 #[derive(Deserialize, Debug)]
 pub struct MinimalUserInfoWithRequestedName {
-    requestedUsername: String,
-    displayName: String,
-    hasVerifiedBadge: bool,
-    id: usize,
-    name: String,
+    pub requestedUsername: String,
+    pub displayName: String,
+    pub hasVerifiedBadge: bool,
+    pub id: usize,
+    pub name: String,
 }
 
 #[allow(dead_code, non_snake_case)]
 #[derive(Deserialize, Debug)]
 pub struct MinimalUserInfoWithPreviousNames {
-    previousUsernames: Option<Vec<String>>,
-    displayName: String,
-    hasVerifiedBadge: bool,
-    id: usize,
-    name: String,
+    pub previousUsernames: Option<Vec<String>>,
+    pub displayName: String,
+    pub hasVerifiedBadge: bool,
+    pub id: usize,
+    pub name: String,
 }
 
 #[allow(dead_code, non_snake_case)]
 #[derive(Deserialize, Debug)]
 pub struct UserSearchPage {
-    previousPageCursor: Option<String>,
-    nextPageCursor: Option<String>,
-    data: Vec<MinimalUserInfoWithPreviousNames>,
+    pub previousPageCursor: Option<String>,
+    pub nextPageCursor: Option<String>,
+    pub data: Vec<MinimalUserInfoWithPreviousNames>,
 }
