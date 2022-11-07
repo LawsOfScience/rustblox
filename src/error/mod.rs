@@ -22,6 +22,10 @@ pub enum RequestError {
     NotAuthenticated,
     /// There was an error sending the request
     RequestError(String, String),
+    /// The endpoint returned a 400-class error code
+    ClientError(String, String),
+    /// The endpoint returned a 500-class error code
+    ServerError(String, String),
 }
 
 impl Display for ClientError {
@@ -48,6 +52,12 @@ impl Display for RequestError {
             Self::NotAuthenticated => f.write_str("You need to be logged in to use this endpoint!"),
             Self::RequestError(url, err) => {
                 f.write_str(format!("Had an error sending the request to {url}:\n{err}").as_str())
+            },
+            Self::ClientError(url, err) => {
+                f.write_str(format!("{url} returned a client error:\n{err}").as_str())
+            },
+            Self::ServerError(url, err) => {
+                f.write_str(format!("{url} had an internal server error:\n{err}").as_str())
             }
         }
     }
