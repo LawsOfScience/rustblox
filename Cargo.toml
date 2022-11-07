@@ -1,7 +1,7 @@
 [package]
 name = "rustblox"
 description = "A Rust library for interacting with the Roblox API"
-version = "0.3.0"
+version = "0.3.1"
 edition = "2021"
 
 [package.metadata]
