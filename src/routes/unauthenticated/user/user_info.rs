@@ -1,7 +1,7 @@
 use crate::client::RequestComponents;
 use crate::client::RustbloxClient;
 use crate::error::RequestError;
-use crate::structs::requests::SortOrder;
+use crate::structs::SortOrder;
 use crate::structs::user::{
     MinimalUserInfo, MinimalUserInfoWithRequestedName, UserInfo, UserSearchPage,
 };
@@ -71,8 +71,7 @@ impl RustbloxClient {
 
         let previous_usernames_data = self
             .make_request::<PreviousUsernamesPage>(components)
-            .await
-            .map_err(|e| RequestError::RequestError(url, e.to_string()))?;
+            .await?;
         let mut previous_usernames: Vec<String> = Vec::new();
         for username in previous_usernames_data.data {
             previous_usernames.push(username.name)
@@ -97,8 +96,7 @@ impl RustbloxClient {
 
         let user_info = self
             .make_request::<UserInfo>(components)
-            .await
-            .map_err(|e| RequestError::RequestError(url, e.to_string()))?;
+            .await?;
 
         Ok(user_info)
     }
@@ -132,8 +130,7 @@ impl RustbloxClient {
 
         let response = self
             .make_request::<MinimalUserInfoObject>(components)
-            .await
-            .map_err(|e| RequestError::RequestError(url, e.to_string()))?;
+            .await?;
 
         let mut user_info_vec: Vec<MinimalUserInfo> = Vec::new();
         for minimal_user in response.data {
@@ -172,8 +169,7 @@ impl RustbloxClient {
 
         let response = self
             .make_request::<MinimalUserInfoWithReqdObject>(components)
-            .await
-            .map_err(|e| RequestError::RequestError(url, e.to_string()))?;
+            .await?;
 
         let mut user_info_vec: Vec<MinimalUserInfoWithRequestedName> = Vec::new();
         for minimal_user in response.data {
@@ -208,8 +204,7 @@ impl RustbloxClient {
 
         let response = self
             .make_request::<UserSearchPage>(components)
-            .await
-            .map_err(|e| RequestError::RequestError(url, e.to_string()))?;
+            .await?;
 
         Ok(response)
     }

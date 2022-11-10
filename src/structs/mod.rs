@@ -1,2 +1,6 @@
-pub mod requests;
 pub mod user;
+
+pub enum SortOrder {
+    Ascending,
+    Descending,
+}
