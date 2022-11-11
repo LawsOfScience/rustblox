@@ -15,7 +15,6 @@ pub struct RustbloxClient {
     pub(crate) reqwest_client: reqwest::Client,
     pub(crate) roblox_cookie: Option<String>,
     pub(crate) csrf_token: Option<String>,
-    pub(crate) automatic_reauth: bool,
 }
 
 impl RustbloxClient {
@@ -107,11 +106,11 @@ impl RustbloxClient {
     /// This function will return an error if:
     /// - You attempt to contact an endpoint that requires authentication while unauthenticated.
     /// - The endpoint responds with an error.
-    /// - Your `.ROBLOSECURITY` cookie or `x-csrf-token` are invalid and the client cannot automatically reauthenticate itself.
-    /// In this case, you will get a [`RequestError::NotAuthenticated`].
+    /// - Your `.ROBLOSECURITY` cookie or `x-csrf-token` are invalid. In this case, you will get a [`RequestError::NotAuthenticated`].
+    /// You can call the `.login()` method to reauthenticate. I'm working on making this an automatic thing.
     ///
     pub(crate) async fn make_request<T>(
-        &mut self,
+        &self,
         components: RequestComponents,
     ) -> Result<T, RequestError>
     where
@@ -142,12 +141,9 @@ impl RustbloxClient {
             .await
             .map_err(|e| RequestError::RequestError(components.url.clone(), e.to_string()))?;
 
-        if response.status().as_u16() == 403 && self.automatic_reauth {
+        if response.status().as_u16() == 403 {
             // Current CSRF token is bad, refresh is necessary
-            self
-                .login()
-                .await
-                .map_err(|e| RequestError::NotAuthenticated)?;
+            return Err(RequestError::NotAuthenticated);
         }
 
         if !response.status().is_success() {

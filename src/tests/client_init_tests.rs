@@ -1,5 +1,7 @@
 use super::get_cookie;
 use crate::client::builder::RustbloxClientBuilder;
+use crate::client::RustbloxClient;
+use crate::client::RequestComponents;
 
 #[test]
 fn build_client() {
@@ -19,19 +21,6 @@ async fn build_and_ping() {
 
 #[tokio::test]
 async fn build_and_login() {
-    let mut client = RustbloxClientBuilder::new()
-        .insert_cookie(&get_cookie())
-        .expect("Invalid cookie")
-        .build()
-        .expect("Had an error building the client");
-
-    let login = client.login().await;
-
-    assert!(login.is_ok());
-}
-
-#[tokio::test]
-async fn build_and_login_new() {
     let mut client = RustbloxClientBuilder::new()
         .insert_cookie(&get_cookie())
         .expect("Invalid cookie")
