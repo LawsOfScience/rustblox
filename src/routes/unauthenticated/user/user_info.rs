@@ -1,10 +1,10 @@
 use crate::client::RequestComponents;
 use crate::client::RustbloxClient;
 use crate::error::RequestError;
-use crate::structs::SortOrder;
 use crate::structs::user::{
     MinimalUserInfo, MinimalUserInfoWithRequestedName, UserInfo, UserSearchPage,
 };
+use crate::structs::SortOrder;
 use reqwest::header::{HeaderMap, HeaderValue};
 use reqwest::Method;
 
@@ -94,9 +94,7 @@ impl RustbloxClient {
             body: None,
         };
 
-        let user_info = self
-            .make_request::<UserInfo>(components)
-            .await?;
+        let user_info = self.make_request::<UserInfo>(components).await?;
 
         Ok(user_info)
     }
@@ -202,9 +200,7 @@ impl RustbloxClient {
             body: None,
         };
 
-        let response = self
-            .make_request::<UserSearchPage>(components)
-            .await?;
+        let response = self.make_request::<UserSearchPage>(components).await?;
 
         Ok(response)
     }

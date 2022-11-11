@@ -54,10 +54,14 @@ impl Display for RequestError {
             Self::NotAuthenticated => f.write_str("You need to be logged in to use this endpoint!"),
             Self::RequestError(url, err) => {
                 f.write_str(format!("Had an error sending the request to {url}:\n{err}").as_str())
-            },
-            Self::ClientError(url, status_code, errors) => {
-                f.write_str(format!("{url} returned status code {status_code}\n{}", errors.to_string()).as_str())
-            },
+            }
+            Self::ClientError(url, status_code, errors) => f.write_str(
+                format!(
+                    "{url} returned status code {status_code}\n{}",
+                    errors.to_string()
+                )
+                .as_str(),
+            ),
             Self::ServerError(status_code) => {
                 f.write_str(format!("Server returned status code {status_code}").as_str())
             }
@@ -76,7 +80,7 @@ pub struct RobloxApiError {
 
 #[derive(Deserialize, Debug)]
 pub struct RobloxApiErrors {
-    pub errors: Vec<RobloxApiError>
+    pub errors: Vec<RobloxApiError>,
 }
 
 impl ToString for RobloxApiError {

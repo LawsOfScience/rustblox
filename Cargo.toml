@@ -1,8 +1,10 @@
 [package]
 name = "rustblox"
 description = "A Rust library for interacting with the Roblox API"
-version = "0.3.1"
+version = "0.4.0"
 edition = "2021"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/LawsOfScience/rustblox"
 
 [package.metadata]
 msrv = "1.62.1"

@@ -150,28 +150,40 @@ impl RustbloxClient {
             let status_code = response.status().as_u16();
             response.status().to_string();
             return if response.status().is_client_error() {
-                let err_body = response
-                    .json::<RobloxApiErrors>()
-                    .await
-                    .map_err(|e| RequestError::RequestError(components.url.clone(), format!("Couldn't parse error body json:\n{}", e.to_string())))?;
-                Err(RequestError::ClientError(components.url, status_code, err_body))
+                let err_body = response.json::<RobloxApiErrors>().await.map_err(|e| {
+                    RequestError::RequestError(
+                        components.url.clone(),
+                        format!("Couldn't parse error body json:\n{}", e.to_string()),
+                    )
+                })?;
+                Err(RequestError::ClientError(
+                    components.url,
+                    status_code,
+                    err_body,
+                ))
             } else if response.status().is_server_error() {
                 Err(RequestError::ServerError(status_code))
             } else {
-                let body = response
-                    .text()
-                    .await
-                    .map_err(|e| RequestError::RequestError(components.url.clone(), format!("Couldn't parse body as string:\n{}", e.to_string())))?;
+                let body = response.text().await.map_err(|e| {
+                    RequestError::RequestError(
+                        components.url.clone(),
+                        format!("Couldn't parse body as string:\n{}", e.to_string()),
+                    )
+                })?;
 
                 let unknown_error = RobloxApiError {
                     code: -999,
-                    message: body
+                    message: body,
                 };
                 let error_struct = RobloxApiErrors {
-                    errors: vec![unknown_error]
+                    errors: vec![unknown_error],
                 };
-                Err(RequestError::ClientError(components.url, status_code, error_struct))
-            }
+                Err(RequestError::ClientError(
+                    components.url,
+                    status_code,
+                    error_struct,
+                ))
+            };
         }
 
         let response_data = response
