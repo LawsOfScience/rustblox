@@ -1,4 +1,4 @@
-use crate::error::{ClientError, RequestError};
+use crate::error::{ClientError, RequestError, RobloxApiError, RobloxApiErrors};
 use reqwest::header::HeaderMap;
 use reqwest::Method;
 use serde::de::DeserializeOwned;
@@ -99,13 +99,16 @@ impl RustbloxClient {
     /// # Panics
     ///
     /// Panics if:
-    ///     - An `x-csrf-token` could not be obtained.
+    /// - An `x-csrf-token` could not be obtained.
     ///
     /// # Errors
     ///
     /// This function will return an error if:
-    ///     - You attempt to contact an endpoint that requires authentication while unauthenticated
-    ///     - The endpoint responds with an error.
+    /// - You attempt to contact an endpoint that requires authentication while unauthenticated.
+    /// - The endpoint responds with an error.
+    /// - Your `.ROBLOSECURITY` cookie or `x-csrf-token` are invalid. In this case, you will get a [`RequestError::NotAuthenticated`].
+    /// You can call the `.login()` method to reauthenticate. I'm working on making this an automatic thing.
+    ///
     pub(crate) async fn make_request<T>(
         &self,
         components: RequestComponents,
@@ -137,6 +140,51 @@ impl RustbloxClient {
             .send()
             .await
             .map_err(|e| RequestError::RequestError(components.url.clone(), e.to_string()))?;
+
+        if response.status().as_u16() == 403 {
+            // Current CSRF token is bad, refresh is necessary
+            return Err(RequestError::NotAuthenticated);
+        }
+
+        if !response.status().is_success() {
+            let status_code = response.status().as_u16();
+            response.status().to_string();
+            return if response.status().is_client_error() {
+                let err_body = response.json::<RobloxApiErrors>().await.map_err(|e| {
+                    RequestError::RequestError(
+                        components.url.clone(),
+                        format!("Couldn't parse error body json:\n{}", e.to_string()),
+                    )
+                })?;
+                Err(RequestError::ClientError(
+                    components.url,
+                    status_code,
+                    err_body,
+                ))
+            } else if response.status().is_server_error() {
+                Err(RequestError::ServerError(status_code))
+            } else {
+                let body = response.text().await.map_err(|e| {
+                    RequestError::RequestError(
+                        components.url.clone(),
+                        format!("Couldn't parse body as string:\n{}", e.to_string()),
+                    )
+                })?;
+
+                let unknown_error = RobloxApiError {
+                    code: -999,
+                    message: body,
+                };
+                let error_struct = RobloxApiErrors {
+                    errors: vec![unknown_error],
+                };
+                Err(RequestError::ClientError(
+                    components.url,
+                    status_code,
+                    error_struct,
+                ))
+            };
+        }
 
         let response_data = response
             .json::<T>()

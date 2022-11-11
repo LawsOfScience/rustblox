@@ -22,6 +22,12 @@ pub enum RequestError {
     NotAuthenticated,
     /// There was an error sending the request
     RequestError(String, String),
+    /// The server returned a 400-class error code (client error).
+    /// Contains the url, status code, and a collection of errors
+    ClientError(String, u16, RobloxApiErrors),
+    /// The server returned a 500-class error code (server error)
+    /// Contains the status code
+    ServerError(u16),
 }
 
 impl Display for ClientError {
@@ -49,9 +55,48 @@ impl Display for RequestError {
             Self::RequestError(url, err) => {
                 f.write_str(format!("Had an error sending the request to {url}:\n{err}").as_str())
             }
+            Self::ClientError(url, status_code, errors) => f.write_str(
+                format!(
+                    "{url} returned status code {status_code}\n{}",
+                    errors.to_string()
+                )
+                .as_str(),
+            ),
+            Self::ServerError(status_code) => {
+                f.write_str(format!("Server returned status code {status_code}").as_str())
+            }
         }
     }
 }
 
 impl StdErr for ClientError {}
 impl StdErr for RequestError {}
+
+#[derive(Deserialize, Debug)]
+pub struct RobloxApiError {
+    pub code: i16,
+    pub message: String,
+}
+
+#[derive(Deserialize, Debug)]
+pub struct RobloxApiErrors {
+    pub errors: Vec<RobloxApiError>,
+}
+
+impl ToString for RobloxApiError {
+    fn to_string(&self) -> String {
+        format!("Error code {}: \"{}\"", self.code, self.message)
+    }
+}
+
+impl ToString for RobloxApiErrors {
+    fn to_string(&self) -> String {
+        let mut format_str = String::from("Roblox API Errors:\n");
+        for error in &self.errors {
+            format_str += " - ";
+            format_str += error.to_string().as_str();
+            format_str += "\n";
+        }
+        format_str
+    }
+}
