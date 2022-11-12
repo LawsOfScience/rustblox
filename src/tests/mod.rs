@@ -1,5 +1,6 @@
 mod client_init_tests;
 mod user_unauth_tests;
+mod group_auth_tests;
 
 use std::fs::{canonicalize, File};
 use std::io::Read;

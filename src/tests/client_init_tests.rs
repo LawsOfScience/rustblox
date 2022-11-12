@@ -1,7 +1,5 @@
 use super::get_cookie;
 use crate::client::builder::RustbloxClientBuilder;
-use crate::client::RequestComponents;
-use crate::client::RustbloxClient;
 
 #[test]
 fn build_client() {
