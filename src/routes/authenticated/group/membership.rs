@@ -168,4 +168,31 @@ impl RustbloxClient {
 
         Ok(join_request)
     }
+
+    /// **MUST AUTHENTICATE**
+    ///
+    /// Kicks (exiles) a given `user_id` from a given `group_id`.
+    ///
+    /// # Errors
+    ///
+    /// This function will error if:
+    /// - You do not have a `.ROBLOSECURITY` cookie set.
+    /// - The endpoint responds with an error.
+    pub async fn kick_user(&self, group_id: usize, user_id: usize) -> Result<(), RequestError> {
+        let url = format!("{BASE_URL}/v1/groups/{group_id}/users/{user_id}");
+
+        let components = RequestComponents {
+            needs_auth: true,
+            method: Method::DELETE,
+            url,
+            headers: None,
+            body: None
+        };
+
+        self
+            .make_request::<serde_json::Value>(components)
+            .await?;
+
+        Ok(())
+    }
 }
