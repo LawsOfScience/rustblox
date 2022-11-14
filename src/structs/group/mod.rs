@@ -2,23 +2,23 @@
 #[allow(dead_code, non_snake_case)]
 #[derive(Deserialize, Debug)]
 pub struct JoinRequesterInfo {
-    hasVerifiedBadge: bool,
-    userId: usize,
-    username: String,
-    displayName: String,
+    pub hasVerifiedBadge: bool,
+    pub userId: usize,
+    pub username: String,
+    pub displayName: String,
 }
 
 #[allow(dead_code)]
 #[derive(Deserialize, Debug)]
 pub struct JoinRequest {
-    requester: JoinRequesterInfo,
-    created: String,
+    pub requester: JoinRequesterInfo,
+    pub created: String,
 }
 
 #[allow(dead_code, non_snake_case)]
 #[derive(Deserialize, Debug)]
 pub struct JoinRequestPage {
-    previousPageCursor: Option<String>,
-    nextPageCursor: Option<String>,
-    data: Vec<JoinRequest>,
+    pub previousPageCursor: Option<String>,
+    pub nextPageCursor: Option<String>,
+    pub data: Vec<JoinRequest>,
 }
