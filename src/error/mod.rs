@@ -20,6 +20,10 @@ pub enum RequestError {
     /// The user tried to use an endpoint that requires authentication
     /// without being authenticated
     NotAuthenticated,
+    /// Automatic client reauthentication failed
+    ReauthenticationFailed(String),
+    /// The `.ROBLOSECURITY` cookie in use expired
+    ExpiredCookie,
     /// There was an error sending the request
     RequestError(String, String),
     /// The server returned a 400-class error code (client error).
@@ -52,6 +56,10 @@ impl Display for RequestError {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::NotAuthenticated => f.write_str("You need to be logged in to use this endpoint!"),
+            Self::ReauthenticationFailed(msg) => {
+                f.write_str(format!("Automatic reauthentication failed:\n{msg}").as_str())
+            }
+            Self::ExpiredCookie => f.write_str("The .ROBLOSECURITY cookie expired."),
             Self::RequestError(url, err) => {
                 f.write_str(format!("Had an error sending the request to {url}:\n{err}").as_str())
             }

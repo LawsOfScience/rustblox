@@ -1,4 +1,5 @@
 use crate::error::{ClientError, RequestError, RobloxApiError, RobloxApiErrors};
+use async_recursion::async_recursion;
 use reqwest::header::HeaderMap;
 use reqwest::Method;
 use serde::de::DeserializeOwned;
@@ -15,6 +16,7 @@ pub struct RustbloxClient {
     pub(crate) reqwest_client: reqwest::Client,
     pub(crate) roblox_cookie: Option<String>,
     pub(crate) csrf_token: Option<String>,
+    pub(crate) auto_reauth: bool,
 }
 
 impl RustbloxClient {
@@ -95,6 +97,11 @@ impl RustbloxClient {
     }
 
     /// Makes a request to the Roblox API.
+    /// If the endpoint returns a 403 error and this function determines that the Client's
+    /// `x-csrf-token` is invalid, it will attempt to reauthenticate itself if `Client.auto_reauth`
+    /// is set to `true`. This value can be set while building the client.
+    /// The Client will only attempt reauthentication once (see the definition of insanity
+    /// for why).
     ///
     /// # Panics
     ///
@@ -106,12 +113,13 @@ impl RustbloxClient {
     /// This function will return an error if:
     /// - You attempt to contact an endpoint that requires authentication while unauthenticated.
     /// - The endpoint responds with an error.
-    /// - Your `.ROBLOSECURITY` cookie or `x-csrf-token` are invalid. In this case, you will get a [`RequestError::NotAuthenticated`].
-    /// You can call the `.login()` method to reauthenticate. I'm working on making this an automatic thing.
-    ///
+    /// - Your `.ROBLOSECURITY` cookie or `x-csrf-token` are invalid and automatic reauthentication failed
+    /// or was not enabled. In either case, you will get a [`RequestError::ReauthenticationFailed`].
+    #[async_recursion::async_recursion]
     pub(crate) async fn make_request<T>(
-        &self,
+        &mut self,
         components: RequestComponents,
+        tried_reauth: bool,
     ) -> Result<T, RequestError>
     where
         T: DeserializeOwned,
@@ -122,7 +130,7 @@ impl RustbloxClient {
 
         let mut request = self
             .reqwest_client
-            .request(components.method, components.url.clone());
+            .request(components.method.clone(), components.url.clone());
         if components.needs_auth {
             request = request
                 .header("Cookie", self.roblox_cookie().unwrap())
@@ -130,10 +138,10 @@ impl RustbloxClient {
         }
 
         if components.headers.is_some() {
-            request = request.headers(components.headers.unwrap());
+            request = request.headers(components.headers.clone().unwrap());
         }
         if components.body.is_some() {
-            request = request.body(components.body.unwrap());
+            request = request.body(components.body.clone().unwrap());
         }
 
         let response = request
@@ -141,20 +149,50 @@ impl RustbloxClient {
             .await
             .map_err(|e| RequestError::RequestError(components.url.clone(), e.to_string()))?;
 
-        if response.status().as_u16() == 403 {
-            // Current CSRF token is bad, refresh is necessary
-            return Err(RequestError::NotAuthenticated);
-        }
-
         if !response.status().is_success() {
             let status_code = response.status().as_u16();
             return if response.status().is_client_error() {
                 let err_body = response.json::<RobloxApiErrors>().await.map_err(|e| {
                     RequestError::RequestError(
                         components.url.clone(),
-                        format!("Couldn't parse error body json:\n{}", e.to_string()),
+                        format!("Couldn't parse error body json:\n{}", e),
                     )
                 })?;
+
+                if status_code == 401 {
+                    // Bad cookie
+                    return Err(RequestError::ExpiredCookie);
+                }
+
+                if status_code == 403 {
+                    // We need to find out if the Roblox API wants us to reauthenticate or if
+                    // the error is for a different reason
+                    let try_first_error = err_body.errors.first();
+                    if try_first_error.is_none() {
+                        return Err(RequestError::ClientError(
+                            components.url,
+                            status_code,
+                            err_body,
+                        ));
+                    }
+                    let first_error = try_first_error.unwrap();
+
+                    // Code 0 == bad CSRF token
+                    if first_error.code == 0 {
+                        if self.auto_reauth && !tried_reauth {
+                            self.login()
+                                .await
+                                .map_err(|e| RequestError::ReauthenticationFailed(e.to_string()))?;
+
+                            return self.make_request::<T>(components, true).await;
+                        }
+                        return Err(RequestError::ReauthenticationFailed(
+                            "Automatic reauthentication either not enabled or already tried"
+                                .to_string(),
+                        ));
+                    }
+                }
+
                 Err(RequestError::ClientError(
                     components.url,
                     status_code,
