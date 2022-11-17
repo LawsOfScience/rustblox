@@ -4,6 +4,7 @@ use crate::error::ClientError;
 pub struct RustbloxClientBuilder {
     reqwest_builder: reqwest::ClientBuilder,
     roblox_cookie: Option<String>,
+    auto_reauth: bool,
 }
 
 impl Default for RustbloxClientBuilder {
@@ -18,6 +19,20 @@ fn get_user_agent() -> String {
 }
 
 impl RustbloxClientBuilder {
+    /// Sets whether or not the client should automatically reauthenticate itself if the Roblox
+    /// API returns a 403 status code.
+    /// The RustbloxClient will only attempt reauthentication once (see the definition of insanity
+    /// for why).
+    ///
+    /// # Errors
+    ///
+    /// This function cannot error.
+    #[inline]
+    pub fn automatic_reauthentication(mut self, auto_reauth: bool) -> Self {
+        self.auto_reauth = auto_reauth;
+        self
+    }
+
     /// Attempts to use a `RustbloxClientBuilder` to construct a `RustbloxClient`. This method will fail if reqwest fails to build a client.
     ///
     /// # Errors
@@ -33,6 +48,7 @@ impl RustbloxClientBuilder {
             reqwest_client: built_client,
             roblox_cookie: self.roblox_cookie,
             csrf_token: None,
+            auto_reauth: self.auto_reauth,
         })
     }
 
@@ -63,6 +79,7 @@ impl RustbloxClientBuilder {
         Self {
             reqwest_builder: reqwest::ClientBuilder::new().user_agent(get_user_agent()),
             roblox_cookie: None,
+            auto_reauth: true,
         }
     }
 }

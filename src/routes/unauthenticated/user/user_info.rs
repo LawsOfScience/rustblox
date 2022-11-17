@@ -43,7 +43,7 @@ impl RustbloxClient {
     ///
     /// This function returns an error if the request could not be made, or if the endpoint responded with an error.
     pub async fn get_previous_usernames(
-        &self,
+        &mut self,
         id: usize,
         limit: Option<usize>,
         cursor: Option<String>,
@@ -70,7 +70,7 @@ impl RustbloxClient {
         };
 
         let previous_usernames_data = self
-            .make_request::<PreviousUsernamesPage>(components)
+            .make_request::<PreviousUsernamesPage>(components, false)
             .await?;
         let mut previous_usernames: Vec<String> = Vec::new();
         for username in previous_usernames_data.data {
@@ -84,7 +84,7 @@ impl RustbloxClient {
     /// # Errors
     ///
     /// This function returns an error if the request could not be made, or if the endpoint responded with an error.
-    pub async fn get_user_info(&self, id: usize) -> Result<UserInfo, RequestError> {
+    pub async fn get_user_info(&mut self, id: usize) -> Result<UserInfo, RequestError> {
         let url = format!("{}/users/{}", BASE_URL, id);
         let components = RequestComponents {
             needs_auth: false,
@@ -94,13 +94,13 @@ impl RustbloxClient {
             body: None,
         };
 
-        let user_info = self.make_request::<UserInfo>(components).await?;
+        let user_info = self.make_request::<UserInfo>(components, false).await?;
 
         Ok(user_info)
     }
 
     pub async fn get_users_from_ids(
-        &self,
+        &mut self,
         ids: Vec<usize>,
         exclude_banned: bool,
     ) -> Result<Vec<MinimalUserInfo>, RequestError> {
@@ -127,7 +127,7 @@ impl RustbloxClient {
         };
 
         let response = self
-            .make_request::<MinimalUserInfoObject>(components)
+            .make_request::<MinimalUserInfoObject>(components, false)
             .await?;
 
         let mut user_info_vec: Vec<MinimalUserInfo> = Vec::new();
@@ -139,7 +139,7 @@ impl RustbloxClient {
     }
 
     pub async fn get_users_from_usernames(
-        &self,
+        &mut self,
         usernames: Vec<&str>,
         exclude_banned: bool,
     ) -> Result<Vec<MinimalUserInfoWithRequestedName>, RequestError> {
@@ -166,7 +166,7 @@ impl RustbloxClient {
         };
 
         let response = self
-            .make_request::<MinimalUserInfoWithReqdObject>(components)
+            .make_request::<MinimalUserInfoWithReqdObject>(components, false)
             .await?;
 
         let mut user_info_vec: Vec<MinimalUserInfoWithRequestedName> = Vec::new();
@@ -178,7 +178,7 @@ impl RustbloxClient {
     }
 
     pub async fn search_user(
-        &self,
+        &mut self,
         username: String,
         limit: Option<usize>,
         page_cursor: Option<String>,
@@ -200,7 +200,9 @@ impl RustbloxClient {
             body: None,
         };
 
-        let response = self.make_request::<UserSearchPage>(components).await?;
+        let response = self
+            .make_request::<UserSearchPage>(components, false)
+            .await?;
 
         Ok(response)
     }
