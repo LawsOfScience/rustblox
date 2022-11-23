@@ -22,3 +22,20 @@ pub struct JoinRequestPage {
     pub nextPageCursor: Option<String>,
     pub data: Vec<JoinRequest>,
 }
+
+#[allow(dead_code, non_snake_case)]
+#[derive(Deserialize, Debug)]
+pub struct GroupRole {
+    pub id: usize,
+    pub name: String,
+    pub description: String,
+    pub rank: u8,
+    pub memberCount: usize,
+}
+
+#[allow(dead_code, non_snake_case)]
+#[derive(Deserialize, Debug)]
+pub struct GroupRolesList {
+    pub groupId: usize,
+    pub roles: Vec<GroupRole>,
+}

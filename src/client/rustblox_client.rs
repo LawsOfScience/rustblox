@@ -1,5 +1,4 @@
 use crate::error::{ClientError, RequestError, RobloxApiError, RobloxApiErrors};
-use async_recursion::async_recursion;
 use reqwest::header::HeaderMap;
 use reqwest::Method;
 use serde::de::DeserializeOwned;

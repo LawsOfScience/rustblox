@@ -1,8 +1,8 @@
 use reqwest::header::{HeaderMap, HeaderValue};
 use reqwest::Method;
 use crate::client::{RequestComponents, RustbloxClient};
-use crate::error::RequestError;
-use crate::structs::group::{JoinRequest, JoinRequestPage};
+use crate::error::{RequestError, RobloxApiError, RobloxApiErrors};
+use crate::structs::group::{GroupRole, GroupRolesList, JoinRequest, JoinRequestPage};
 
 const BASE_URL: &str = "https://groups.roblox.com";
 
@@ -144,6 +144,31 @@ impl RustbloxClient {
 
     /// **MUST AUTHENTICATE**
     ///
+    /// Gets a list of the group's roles.
+    ///
+    /// # Errors
+    ///
+    /// This function will error if:
+    /// - You do not have a `.ROBLOSECURITY` cookie set.
+    /// - The endpoint responds with an error.
+    pub async fn get_group_roles(&mut self, group_id: usize) -> Result<GroupRolesList, RequestError> {
+        let url = format!("{BASE_URL}/v1/groups/{group_id}/roles");
+        
+        let components = RequestComponents {
+            needs_auth: true,
+            method: Method::GET,
+            url,
+            headers: None,
+            body: None,
+        };
+        let ranks = self
+            .make_request::<GroupRolesList>(components, false)
+            .await?;
+        Ok(ranks)
+    }
+
+    /// **MUST AUTHENTICATE**
+    ///
     /// Gets a join request that a given `user_id` sent to a given `group_id`.
     /// *Will be `None` if the join request doesn't exist.*
     ///
@@ -187,6 +212,61 @@ impl RustbloxClient {
             url,
             headers: None,
             body: None
+        };
+
+        self
+            .make_request::<serde_json::Value>(components, false)
+            .await?;
+
+        Ok(())
+    }
+
+    /// **MUST AUTHENTICATE**
+    ///
+    /// Sets the role of a given `user_id` in a given `group_id`.
+    /// TODO: Figure out how to use GroupRole instead of `role_rank_id`
+    ///
+    /// # Errors
+    ///
+    /// This function will error if:
+    /// - You do not have a `.ROBLOSECURITY` cookie set.
+    /// - The endpoint responds with an error.
+    /// - No such role exists in the group.
+    pub async fn set_user_role_in_group(&mut self, group_id: usize, user_id: usize, role_rank_id: u8) -> Result<(), RequestError> {
+        let url = format!("{BASE_URL}/v1/groups/{group_id}/users/{user_id}");
+
+        let roles = self.get_group_roles(group_id).await?;
+        let desired_role: Vec<GroupRole> = roles.roles.into_iter().filter(|role| role.rank == role_rank_id).collect();
+        if desired_role.is_empty() {
+            let error = RobloxApiErrors {
+                errors: vec![
+                    RobloxApiError {
+                        code: 2,
+                        message: "The roleset is invalid or does not exist.".to_string(),
+                    }
+                ],
+            };
+            return Err(RequestError::ClientError(url, 400, error));
+        }
+
+        let data_json = json!({
+            "roleId": desired_role.first().unwrap().id
+        });
+        let data_size = data_json.clone().to_string().as_bytes().len();
+
+        let mut headers = HeaderMap::new();
+        headers.insert("Content-Length", HeaderValue::from(data_size));
+        headers.insert(
+            "Content-Type",
+            HeaderValue::from_str("application/json").unwrap(),
+        );
+
+        let components = RequestComponents {
+            needs_auth: true,
+            method: Method::PATCH,
+            url,
+            headers: Some(headers),
+            body: Some(data_json.to_string()),
         };
 
         self
