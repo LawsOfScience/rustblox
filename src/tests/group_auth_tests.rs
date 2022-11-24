@@ -67,3 +67,11 @@ async fn set_user_rank() {
     println!("{:#?}", result);
     assert!(result.is_ok());
 }
+
+#[tokio::test]
+async fn get_user_group_roles() {
+    let mut client = create_authed_client().await;
+    let result = client.get_user_group_roles(68429027).await;
+    println!("{:#?}", result);
+    assert!(result.is_ok());
+}
