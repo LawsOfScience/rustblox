@@ -1,0 +1,19 @@
+# Endpoints in this folder
+- [x] Batch decline `DELETE /v1/groups/{groupId}/join-requests`
+- [x] Batch get `GET /v1/groups/{groupId}/join-requests`
+- [x] Batch accept `POST /v1/groups/{groupId}/join-requests`
+- [x] Decline for user `DELETE /v1/groups/{groupId}/join-requests/users/{userId}`
+- [x] Get for user `GET /v1/groups/{groupId}/join-requests/users/{userId}`
+- [x] Accept for user `POST /v1/groups/{groupId}/join-requests/users/{userId}`
+- [ ] Membership info for authed user `GET /v1/groups/{groupId}/membership`
+- [ ] Get roles `GET /v1/groups/{groupId}/roles`
+- [ ] Get users in a role `GET /v1/groups/{groupId}/roles/{roleSetId}/users`
+- [ ] Get list of members `GET /v1/groups/{groupId}/users`
+- [ ] Join group (?) `POST /v1/groups/{groupId}/users`
+- [ ] Get authed user's join requests `GET /v1/user/groups/pending`
+- [ ] Get groups of authed user's friends `GET /v1/users/{userId}/friends/groups/roles`
+- [ ] Get group roles for authed user `GET /v1/users/{userId}/groups/roles `
+- [ ] Change owner `POST /v1/groups/{groupId}/change-owner`
+- [ ] Claim group `POST /v1/groups/{groupId}/claim-ownership`
+- [x] Exile user `DELETE /v1/groups/{groupId}/users/{userId}`
+- [ ] Update a user's role in a group `PATCH /v1/groups/{groupId}/users/{userId}`
