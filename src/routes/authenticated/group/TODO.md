@@ -6,14 +6,14 @@
 - [x] Get for user `GET /v1/groups/{groupId}/join-requests/users/{userId}`
 - [x] Accept for user `POST /v1/groups/{groupId}/join-requests/users/{userId}`
 - [ ] Membership info for authed user `GET /v1/groups/{groupId}/membership`
-- [ ] Get roles `GET /v1/groups/{groupId}/roles`
-- [ ] Get users in a role `GET /v1/groups/{groupId}/roles/{roleSetId}/users`
-- [ ] Get list of members `GET /v1/groups/{groupId}/users`
 - [ ] Join group (?) `POST /v1/groups/{groupId}/users`
 - [ ] Get authed user's join requests `GET /v1/user/groups/pending`
-- [ ] Get groups of authed user's friends `GET /v1/users/{userId}/friends/groups/roles`
-- [ ] Get group roles for authed user `GET /v1/users/{userId}/groups/roles `
 - [ ] Change owner `POST /v1/groups/{groupId}/change-owner`
 - [ ] Claim group `POST /v1/groups/{groupId}/claim-ownership`
 - [x] Exile user `DELETE /v1/groups/{groupId}/users/{userId}`
-- [ ] Update a user's role in a group `PATCH /v1/groups/{groupId}/users/{userId}`
+- [x] Update a user's role in a group `PATCH /v1/groups/{groupId}/users/{userId}`
+- [x] Get roles `GET /v1/groups/{groupId}/roles` (NA)
+- [ ] Get users in a role `GET /v1/groups/{groupId}/roles/{roleSetId}/users` (NA)
+- [ ] Get list of members `GET /v1/groups/{groupId}/users` (NA)
+- [ ] Get groups of authed user's friends `GET /v1/users/{userId}/friends/groups/roles` (NA)
+- [x] Get group roles for user `GET /v1/users/{userId}/groups/roles` (NA)
