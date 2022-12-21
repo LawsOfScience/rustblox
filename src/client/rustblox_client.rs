@@ -1,5 +1,4 @@
 use crate::error::{ClientError, RequestError, RobloxApiError, RobloxApiErrors};
-use async_recursion::async_recursion;
 use reqwest::header::HeaderMap;
 use reqwest::Method;
 use serde::de::DeserializeOwned;
@@ -151,7 +150,6 @@ impl RustbloxClient {
 
         if !response.status().is_success() {
             let status_code = response.status().as_u16();
-            response.status().to_string();
             return if response.status().is_client_error() {
                 let err_body = response.json::<RobloxApiErrors>().await.map_err(|e| {
                     RequestError::RequestError(
