@@ -1,18 +1,8 @@
-// Why doesn't the Roblox API return a common user data JSON object???
-#[derive(Deserialize, Debug)]
-pub struct JoinRequesterInfo {
-    #[serde(rename = "hasVerifiedBadge")]
-    pub has_verified_badge: bool,
-    #[serde(rename = "userId")]
-    pub user_id: usize,
-    pub username: String,
-    #[serde(rename = "displayName")]
-    pub display_name: String,
-}
+use crate::structs::user::MinimalUserInfo;
 
 #[derive(Deserialize, Debug)]
 pub struct JoinRequest {
-    pub requester: JoinRequesterInfo,
+    pub requester: MinimalUserInfo,
     pub created: String,
 }
 
@@ -58,7 +48,7 @@ pub struct UserGroupInfo {
     pub id: usize,
     pub name: String,
     pub description: String,
-    pub owner: UserGroupOwnerInfo,
+    pub owner: MinimalUserInfo,
     pub shout: Option<String>,
     #[serde(rename = "memberCount")]
     pub member_count: usize,
@@ -71,17 +61,6 @@ pub struct UserGroupInfo {
     #[serde(default)]
     #[serde(rename = "isPrimaryGroup")]
     pub is_primary_group: bool,
-}
-
-#[derive(Deserialize, Debug)]
-pub struct UserGroupOwnerInfo {
-    #[serde(rename = "hasVerifiedBadge")]
-    pub has_verified_badge: bool,
-    #[serde(rename = "userId")]
-    pub user_id: usize, // ROBLOX, WHY DOES MinimalUserInfo HAVE "id" BUT THIS HAS "userId"?!?!?!?!
-    pub username: String,
-    #[serde(rename = "displayName")]
-    pub display_name: String,
 }
 
 #[derive(Deserialize, Debug)]

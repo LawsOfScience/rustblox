@@ -20,9 +20,14 @@ pub struct MinimalUserInfo {
     pub display_name: String,
     #[serde(rename = "hasVerifiedBadge")]
     pub has_verified_badge: bool,
+    #[serde(alias = "userId")]
     pub id: usize,
+    #[serde(alias = "username")]
     pub name: String,
 }
+// I love the #[serde(alias)] macro since, for some reason, Roblox
+// decided to change the names of certain JSON objects
+// DESPITE THEM LITERALLY HAVING THE SAME DATA.
 
 #[derive(Deserialize, Debug)]
 pub struct MinimalUserInfoWithRequestedName {
