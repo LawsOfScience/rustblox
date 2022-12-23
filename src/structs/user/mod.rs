@@ -1,49 +1,58 @@
-#[allow(dead_code, non_snake_case)]
 #[derive(Deserialize, Debug)]
 pub struct UserInfo {
     pub description: String,
     pub created: String,
-    pub isBanned: bool,
-    pub externalAppDisplayName: Option<String>,
-    pub hasVerifiedBadge: bool,
+    #[serde(rename = "isBanned")]
+    pub is_banned: bool,
+    #[serde(rename = "externalAppDisplayName")]
+    pub external_app_display_name: Option<String>,
+    #[serde(rename = "hasVerifiedBadge")]
+    pub has_verified_badge: bool,
     pub id: usize,
     pub name: String,
-    pub displayName: String,
+    #[serde(rename = "displayName")]
+    pub display_name: String,
 }
 
-#[allow(dead_code, non_snake_case)]
 #[derive(Deserialize, Debug)]
 pub struct MinimalUserInfo {
-    pub displayName: String,
-    pub hasVerifiedBadge: bool,
+    #[serde(rename = "displayName")]
+    pub display_name: String,
+    #[serde(rename = "hasVerifiedBadge")]
+    pub has_verified_badge: bool,
     pub id: usize,
     pub name: String,
 }
 
-#[allow(dead_code, non_snake_case)]
 #[derive(Deserialize, Debug)]
 pub struct MinimalUserInfoWithRequestedName {
-    pub requestedUsername: String,
-    pub displayName: String,
-    pub hasVerifiedBadge: bool,
+    #[serde(rename = "requestedUsername")]
+    pub requested_username: String,
+    #[serde(rename = "displayName")]
+    pub display_name: String,
+    #[serde(rename = "hasVerifiedBadge")]
+    pub has_verified_badge: bool,
     pub id: usize,
     pub name: String,
 }
 
-#[allow(dead_code, non_snake_case)]
 #[derive(Deserialize, Debug)]
 pub struct MinimalUserInfoWithPreviousNames {
-    pub previousUsernames: Option<Vec<String>>,
-    pub displayName: String,
-    pub hasVerifiedBadge: bool,
+    #[serde(rename = "previousUsernames")]
+    pub previous_usernames: Option<Vec<String>>,
+    #[serde(rename = "displayName")]
+    pub display_name: String,
+    #[serde(rename = "hasVerifiedBadge")]
+    pub has_verified_badge: bool,
     pub id: usize,
     pub name: String,
 }
 
-#[allow(dead_code, non_snake_case)]
 #[derive(Deserialize, Debug)]
 pub struct UserSearchPage {
-    pub previousPageCursor: Option<String>,
-    pub nextPageCursor: Option<String>,
+    #[serde(rename = "previousPageCursor")]
+    pub previous_page_cursor: Option<String>,
+    #[serde(rename = "nextPageCursor")]
+    pub next_page_cursor: Option<String>,
     pub data: Vec<MinimalUserInfoWithPreviousNames>,
 }
