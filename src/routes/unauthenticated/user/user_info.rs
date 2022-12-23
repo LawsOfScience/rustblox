@@ -1,9 +1,7 @@
 use crate::client::RequestComponents;
 use crate::client::RustbloxClient;
 use crate::error::RequestError;
-use crate::structs::user::{
-    MinimalUserInfo, MinimalUserInfoWithRequestedName, UserInfo, UserSearchPage,
-};
+use crate::structs::user::{MinimalUserInfo, MinimalUserInfoWithRequestedName, PreviousUsernamesPage, UserInfo, UserSearchPage};
 use crate::structs::SortOrder;
 use reqwest::header::{HeaderMap, HeaderValue};
 use reqwest::Method;
@@ -22,20 +20,6 @@ struct MinimalUserInfoWithReqdObject {
     data: Vec<MinimalUserInfoWithRequestedName>,
 }
 
-#[allow(dead_code, non_snake_case)]
-#[derive(Deserialize, Debug)]
-struct PreviousUsername {
-    name: String,
-}
-
-#[allow(dead_code, non_snake_case)]
-#[derive(Deserialize, Debug)]
-struct PreviousUsernamesPage {
-    previousPageCursor: Option<String>,
-    nextPageCursor: Option<String>,
-    data: Vec<PreviousUsername>,
-}
-
 impl RustbloxClient {
     /// Gets a user's previous usernames, given their user ID.
     ///
@@ -48,7 +32,7 @@ impl RustbloxClient {
         limit: Option<usize>,
         cursor: Option<String>,
         sort_order: Option<SortOrder>,
-    ) -> Result<Vec<String>, RequestError> {
+    ) -> Result<PreviousUsernamesPage, RequestError> {
         let real_limit = if limit.is_some() { limit.unwrap() } else { 10 };
         let mut url = format!("{BASE_URL}/users/{id}/username-history?limit={real_limit}");
         if cursor.is_some() {
@@ -72,12 +56,7 @@ impl RustbloxClient {
         let previous_usernames_data = self
             .make_request::<PreviousUsernamesPage>(components, false)
             .await?;
-        let mut previous_usernames: Vec<String> = Vec::new();
-        for username in previous_usernames_data.data {
-            previous_usernames.push(username.name)
-        }
-
-        Ok(previous_usernames)
+        Ok(previous_usernames_data)
     }
     /// Gets the info about a user from their user ID.
     ///
@@ -130,12 +109,7 @@ impl RustbloxClient {
             .make_request::<MinimalUserInfoObject>(components, false)
             .await?;
 
-        let mut user_info_vec: Vec<MinimalUserInfo> = Vec::new();
-        for minimal_user in response.data {
-            user_info_vec.push(minimal_user);
-        }
-
-        Ok(user_info_vec)
+        Ok(response.data)
     }
 
     pub async fn get_users_from_usernames(
@@ -169,12 +143,7 @@ impl RustbloxClient {
             .make_request::<MinimalUserInfoWithReqdObject>(components, false)
             .await?;
 
-        let mut user_info_vec: Vec<MinimalUserInfoWithRequestedName> = Vec::new();
-        for minimal_user in response.data {
-            user_info_vec.push(minimal_user);
-        }
-
-        Ok(user_info_vec)
+        Ok(response.data)
     }
 
     pub async fn search_user(

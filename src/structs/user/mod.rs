@@ -61,3 +61,18 @@ pub struct UserSearchPage {
     pub next_page_cursor: Option<String>,
     pub data: Vec<MinimalUserInfoWithPreviousNames>,
 }
+
+#[allow(dead_code, non_snake_case)]
+#[derive(Deserialize, Debug)]
+pub struct PreviousUsernamesPage {
+    previousPageCursor: Option<String>,
+    nextPageCursor: Option<String>,
+    data: Vec<PreviousUsername>,
+}
+
+#[allow(dead_code, non_snake_case)]
+#[derive(Deserialize, Debug)]
+pub struct PreviousUsername {
+    name: String,
+}
+
