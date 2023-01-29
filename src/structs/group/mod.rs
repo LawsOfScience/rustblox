@@ -1,69 +1,82 @@
 use crate::structs::user::MinimalUserInfo;
 
-#[derive(Deserialize, Debug)]
+/// Represents a join request to a group. Used in
+/// [`get_user_join_request`](crate::client::RustbloxClient::get_user_join_request)
+/// as well as in [`JoinRequestPage`].
+#[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
 pub struct JoinRequest {
     pub requester: MinimalUserInfo,
     pub created: String,
 }
 
-#[derive(Deserialize, Debug)]
+/// Represents a page of join requests to a group. Used in
+/// [`batch_get_requests`](crate::client::RustbloxClient::batch_get_requests).
+#[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
 pub struct JoinRequestPage {
-    #[serde(rename = "previousPageCursor")]
     pub previous_page_cursor: Option<String>,
-    #[serde(rename = "nextPageCursor")]
     pub next_page_cursor: Option<String>,
     pub data: Vec<JoinRequest>,
 }
 
-#[derive(Deserialize, Debug)]
+/// Represents a role in a group. Used as a component
+/// of [`GroupRolesList`].
+#[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
 pub struct GroupRole {
     pub id: usize,
     pub name: String,
     pub description: String,
     pub rank: u8,
-    #[serde(rename = "memberCount")]
     pub member_count: usize,
 }
 
-#[derive(Deserialize, Debug)]
+/// Represents a list of roles in a group. Used in
+/// [`get_group_roles`](crate::client::RustbloxClient::get_group_roles).
+#[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
 pub struct GroupRolesList {
-    #[serde(rename = "groupId")]
     pub group_id: usize,
     pub roles: Vec<GroupRole>,
 }
 
-#[derive(Deserialize, Debug)]
+/// Represents a list of groups that a user is in. Used
+/// in [`get_user_group_roles`](crate::client::RustbloxClient::get_user_group_roles).
+#[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
 pub struct UserGroupList {
     pub data: Vec<UserGroup>
 }
 
-#[derive(Deserialize, Debug)]
+/// Represents a group that a user is in, containing the group info
+/// and info about the user's rank/role in it. Used as a component
+/// of [`UserGroupList`].
+#[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
 pub struct UserGroup {
     pub group: UserGroupInfo,
     pub role: UserRoleInGroup,
 }
 
-#[derive(Deserialize, Debug)]
+/// Contains all the information about a group that a certain user
+/// is in. Used as a component of [`UserGroup`].
+#[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
 pub struct UserGroupInfo {
     pub id: usize,
     pub name: String,
     pub description: String,
     pub owner: MinimalUserInfo,
     pub shout: Option<String>,
-    #[serde(rename = "memberCount")]
     pub member_count: usize,
-    #[serde(rename = "isBuildersClubOnly")]
     pub is_builders_club_only: bool,
-    #[serde(rename = "publicEntryAllowed")]
     pub public_entry_allowed: bool,
-    #[serde(rename = "hasVerifiedBadge")]
     pub has_verified_badge: bool,
     #[serde(default)]
-    #[serde(rename = "isPrimaryGroup")]
     pub is_primary_group: bool,
 }
 
-#[derive(Deserialize, Debug)]
+/// Contains information about a user's role in a certain group. Used
+/// as a component of [`UserGroup`].
+#[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
 pub struct UserRoleInGroup {
     pub id: usize,
     pub name: String,

@@ -11,6 +11,9 @@ pub(crate) struct RequestComponents {
     pub(crate) body: Option<String>,
 }
 
+/// The Rustblox client. All functions necessary to contact endpoints
+/// are contained within `impl`s. Eventually, users will be able to control
+/// which functions they want with crate features.
 pub struct RustbloxClient {
     pub(crate) reqwest_client: reqwest::Client,
     pub(crate) roblox_cookie: Option<String>,

@@ -1,24 +1,27 @@
-#[derive(Deserialize, Debug)]
+/// Contains the expanded set of user info provided by
+/// the Roblox API. Used primarily by
+/// [`get_user_info`](crate::client::RustbloxClient::get_user_info).
+#[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
 pub struct UserInfo {
     pub description: String,
     pub created: String,
-    #[serde(rename = "isBanned")]
     pub is_banned: bool,
-    #[serde(rename = "externalAppDisplayName")]
     pub external_app_display_name: Option<String>,
-    #[serde(rename = "hasVerifiedBadge")]
     pub has_verified_badge: bool,
     pub id: usize,
     pub name: String,
-    #[serde(rename = "displayName")]
     pub display_name: String,
 }
 
-#[derive(Deserialize, Debug)]
+/// Contains a minimal set of user info provided by
+/// the Roblox API. Used throughout a variety of functions
+/// whenever a small amount of user info is returned as part of
+/// a larger body.
+#[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
 pub struct MinimalUserInfo {
-    #[serde(rename = "displayName")]
     pub display_name: String,
-    #[serde(rename = "hasVerifiedBadge")]
     pub has_verified_badge: bool,
     #[serde(alias = "userId")]
     pub id: usize,
@@ -29,49 +32,60 @@ pub struct MinimalUserInfo {
 // decided to change the names of certain JSON objects
 // DESPITE THEM LITERALLY HAVING THE SAME DATA.
 
-#[derive(Deserialize, Debug)]
+/// Contains a minimal set of user info provided by
+/// the Roblox API, along with the username that was requested
+/// to search by. Used primarily by
+/// [`get_users_from_usernames`](crate::client::RustbloxClient::get_users_from_usernames).
+#[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
 pub struct MinimalUserInfoWithRequestedName {
-    #[serde(rename = "requestedUsername")]
     pub requested_username: String,
-    #[serde(rename = "displayName")]
     pub display_name: String,
-    #[serde(rename = "hasVerifiedBadge")]
     pub has_verified_badge: bool,
     pub id: usize,
     pub name: String,
 }
 
-#[derive(Deserialize, Debug)]
+/// Contains a minimal set of user info provided by
+/// the Roblox API, along with the user's previous usernames.
+/// Used as a component of [`UserSearchPage`].
+#[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
 pub struct MinimalUserInfoWithPreviousNames {
-    #[serde(rename = "previousUsernames")]
     pub previous_usernames: Option<Vec<String>>,
-    #[serde(rename = "displayName")]
     pub display_name: String,
-    #[serde(rename = "hasVerifiedBadge")]
     pub has_verified_badge: bool,
     pub id: usize,
     pub name: String,
 }
 
-#[derive(Deserialize, Debug)]
+/// Represents a page of search results when searching for
+/// a user by username. Used primarily in
+/// [`search_user`](crate::client::RustbloxClient::search_user).
+#[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
 pub struct UserSearchPage {
-    #[serde(rename = "previousPageCursor")]
     pub previous_page_cursor: Option<String>,
-    #[serde(rename = "nextPageCursor")]
     pub next_page_cursor: Option<String>,
     pub data: Vec<MinimalUserInfoWithPreviousNames>,
 }
 
+/// Represents a page of search results when searching for
+/// a user's previous usernames. Used primarily in
+/// [`get_previous_usernames`](crate::client::RustbloxClient::get_previous_usernames).
 #[allow(dead_code, non_snake_case)]
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
 pub struct PreviousUsernamesPage {
-    previousPageCursor: Option<String>,
-    nextPageCursor: Option<String>,
+    previous_page_cursor: Option<String>,
+    next_page_cursor: Option<String>,
     data: Vec<PreviousUsername>,
 }
 
+/// Represents a user's previous username. Used as a component
+/// of [`PreviousUsernamesPage`].
 #[allow(dead_code, non_snake_case)]
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
 pub struct PreviousUsername {
     name: String,
 }

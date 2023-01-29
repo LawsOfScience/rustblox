@@ -1,6 +1,4 @@
-use crate::client::builder::RustbloxClientBuilder;
 use crate::client::RustbloxClient;
-use crate::error::RequestError;
 use super::get_cookie;
 
 #[tokio::test]

@@ -1,7 +1,8 @@
-use std::error::Error as StdErr;
 use std::fmt::{Display, Formatter};
+use thiserror::Error;
 
-#[derive(Debug)]
+/// Represents a 400-class error response from a request.
+#[derive(Debug, Error)]
 #[non_exhaustive]
 pub enum ClientError {
     /// The `.ROBLOSECURITY` cookie is invalid.
@@ -14,7 +15,8 @@ pub enum ClientError {
     ReqwestBuildError(String),
 }
 
-#[derive(Debug)]
+/// Represents an error-type response from a request.
+#[derive(Debug, Error)]
 #[non_exhaustive]
 pub enum RequestError {
     /// The user tried to use an endpoint that requires authentication
@@ -77,16 +79,13 @@ impl Display for RequestError {
     }
 }
 
-impl StdErr for ClientError {}
-impl StdErr for RequestError {}
-
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Clone, Eq, PartialEq)]
 pub struct RobloxApiError {
     pub code: i16,
     pub message: String,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Clone, Eq, PartialEq)]
 pub struct RobloxApiErrors {
     pub errors: Vec<RobloxApiError>,
 }

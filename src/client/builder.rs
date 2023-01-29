@@ -1,6 +1,17 @@
 use crate::client::RustbloxClient;
 use crate::error::ClientError;
 
+/// Builds a Rustblox client.
+///
+/// # Fields
+/// - `reqwest_builder`: A holder for the RustbloxClient's internal
+/// reqwest client. Does not ever need to be set by the user.
+/// - `roblox_cookie`: A .ROBLOSECURITY cookie to be used to authenticate
+/// certain requests. Does not need to be set if the user will not use authenticated
+/// endpoints (which are labeled). Can be set by [`insert_cookie`](RustbloxClientBuilder::insert_cookie).
+/// - `auto_reauth`: Controls whether the Rustblox client built by this will attempt to
+/// automatically refresh its `x-csrf-token`. True by default. Can be manually overridden by
+/// [`automatic_reauthentication`](RustbloxClientBuilder::automatic_reauthentication).
 pub struct RustbloxClientBuilder {
     reqwest_builder: reqwest::ClientBuilder,
     roblox_cookie: Option<String>,
