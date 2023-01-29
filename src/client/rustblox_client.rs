@@ -151,33 +151,41 @@ impl RustbloxClient {
         if !response.status().is_success() {
             let status_code = response.status().as_u16();
             return if response.status().is_client_error() {
-                let err_body = response.json::<RobloxApiErrors>().await.map_err(|e| {
-                    RequestError::RequestError(
-                        components.url.clone(),
-                        format!("Couldn't parse error body json:\n{}", e),
-                    )
-                })?;
-
                 if status_code == 401 {
                     // Bad cookie
                     return Err(RequestError::ExpiredCookie);
                 }
 
+                // Have to parse as serde_json::Value because SPECIFICALLY
+                // 403 Token Validation Failed has different JSON than the
+                // rest of the errors
+                let err_body_text = response.text().await.map_err(|e| {
+                    RequestError::RequestError(
+                        components.url.clone(),
+                        format!("Failed to get error response body:\n{}", e)
+                    )
+                })?;
+                let raw_err_body = serde_json::from_str::<serde_json::Value>(err_body_text.as_str()).map_err(|e| {
+                    RequestError::RequestError(
+                        components.url.clone(),
+                        format!("Couldn't parse error body json:\n{}Response body:\n{}", e, err_body_text),
+                    )
+                })?;
+
                 if status_code == 403 {
                     // We need to find out if the Roblox API wants us to reauthenticate or if
                     // the error is for a different reason
-                    let try_first_error = err_body.errors.first();
-                    if try_first_error.is_none() {
-                        return Err(RequestError::ClientError(
-                            components.url,
-                            status_code,
-                            err_body,
-                        ));
-                    }
-                    let first_error = try_first_error.unwrap();
+                    if raw_err_body.get("code").is_some() {
+                        // This means that we *probably* have a 403 Token Validation Failed
+                        // since the json is just { code: number, message: string }
+                        if raw_err_body.get("code").unwrap() != 0 {
+                            return Err(RequestError::RequestError(
+                                components.url.clone(),
+                                format!("Unknown 403 error:\n{}", raw_err_body)
+                            ));
+                        }
 
-                    // Code 0 == bad CSRF token
-                    if first_error.code == 0 {
+                        // Now we definitely have a 403 Token Validation Failed
                         if self.auto_reauth && !tried_reauth {
                             self.login()
                                 .await
@@ -192,6 +200,13 @@ impl RustbloxClient {
                     }
                 }
 
+                let err_body = serde_json::from_value::<RobloxApiErrors>(raw_err_body.clone())
+                    .map_err(|e|
+                        RequestError::RequestError(
+                            components.url.clone(),
+                            format!("Couldn't parse error body json as RobloxApiErrors:\n{}\nResponse body:\n{}", e, raw_err_body),
+                    ))?;
+
                 Err(RequestError::ClientError(
                     components.url,
                     status_code,
@@ -203,7 +218,7 @@ impl RustbloxClient {
                 let body = response.text().await.map_err(|e| {
                     RequestError::RequestError(
                         components.url.clone(),
-                        format!("Couldn't parse body as string:\n{}", e.to_string()),
+                        format!("Couldn't parse body as string:\n{}", e),
                     )
                 })?;
 
