@@ -21,11 +21,17 @@ struct MinimalUserInfoWithReqdObject {
 }
 
 impl RustbloxClient {
+    // ENDPOINTS NOT SUPPORTED:
+    // `GET /v1/display-names/validate`
+
     /// Gets a user's previous usernames, given their user ID.
     ///
     /// # Errors
     ///
     /// This function returns an error if the request could not be made, or if the endpoint responded with an error.
+    ///
+    /// Possible error responses:
+    /// - Status 400 code 3: The user ID is invalid
     pub async fn get_previous_usernames(
         &mut self,
         id: usize,
@@ -58,13 +64,17 @@ impl RustbloxClient {
             .await?;
         Ok(previous_usernames_data)
     }
+
     /// Gets the info about a user from their user ID.
     ///
     /// # Errors
     ///
     /// This function returns an error if the request could not be made, or if the endpoint responded with an error.
+    ///
+    /// Possible error responses:
+    /// - Status 404 code 3: The user ID is invalid
     pub async fn get_user_info(&mut self, id: usize) -> Result<UserInfo, RequestError> {
-        let url = format!("{}/users/{}", BASE_URL, id);
+        let url = format!("{BASE_URL}/users/{id}");
         let components = RequestComponents {
             needs_auth: false,
             method: Method::GET,
@@ -78,12 +88,20 @@ impl RustbloxClient {
         Ok(user_info)
     }
 
+    /// Searches for users by their IDs.
+    ///
+    /// # Errors
+    ///
+    /// This function returns an error if the request could not be made, or if the endpoint responded with an error.
+    ///
+    /// Possible error responses:
+    /// - Status 400 code 1: Too many IDs
     pub async fn get_users_from_ids(
         &mut self,
         ids: Vec<usize>,
         exclude_banned: bool,
     ) -> Result<Vec<MinimalUserInfo>, RequestError> {
-        let url = format!("{}/users", BASE_URL);
+        let url = format!("{BASE_URL}/users");
         let data_json = json!({
             "userIds": ids,
             "excludeBannedUsers": exclude_banned
@@ -112,12 +130,20 @@ impl RustbloxClient {
         Ok(response.data)
     }
 
+    /// Searches for users by their usernames.
+    ///
+    /// # Errors
+    ///
+    /// This function returns an error if the request could not be made, or if the endpoint responded with an error.
+    ///
+    /// Possible error responses:
+    /// - Status 400 code 2: Too many usernames
     pub async fn get_users_from_usernames(
         &mut self,
         usernames: Vec<&str>,
         exclude_banned: bool,
     ) -> Result<Vec<MinimalUserInfoWithRequestedName>, RequestError> {
-        let url = format!("{}/usernames/users", BASE_URL);
+        let url = format!("{BASE_URL}/usernames/users");
         let data_json = json!({
             "usernames": usernames,
             "excludeBannedUsers": exclude_banned
@@ -146,6 +172,16 @@ impl RustbloxClient {
         Ok(response.data)
     }
 
+    /// Searches for a specific user.
+    ///
+    /// # Errors
+    ///
+    /// This function returns an error if the request could not be made, or if the endpoint responded with an error.
+    ///
+    /// Possible error responses:
+    /// - Status 400 code 5: The username (keyword) was filtered
+    /// - Status 400 code 6: The username (keyword) is too short
+    /// - Status 429 code 4: Too many requests
     pub async fn search_user(
         &mut self,
         username: String,
@@ -154,8 +190,7 @@ impl RustbloxClient {
     ) -> Result<UserSearchPage, RequestError> {
         let real_limit = if limit.is_some() { limit.unwrap() } else { 10 };
         let mut url = format!(
-            "{}/users/search?keyword={}&limit={}",
-            BASE_URL, username, real_limit
+            "{BASE_URL}/users/search?keyword={username}&limit={real_limit}"
         );
         if page_cursor.is_some() {
             url = format!("{}&cursor={}", url, page_cursor.unwrap());
