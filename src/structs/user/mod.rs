@@ -14,6 +14,39 @@ pub struct UserInfo {
     pub display_name: String,
 }
 
+/// Contains minimal information about the authenticated user.
+/// Used in [`get_authenticated_user`](crate::client::RustbloxClient::get_authenticated_user).
+#[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct MinimalAuthenticatedUser {
+    pub id: usize,
+    pub name: String,
+    pub display_name: String,
+}
+
+/// Contains information about the authenticated user's age bracket.
+/// Used in [`get_authenticated_user_age_bracket`](crate::client::RustbloxClient::get_authenticated_user_age_bracket).
+#[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct AuthenticatedUserAgeBracket {
+    pub age_bracket: usize
+}
+
+/// Contains information about the authenticated user's country code.
+/// Used in [`get_authenticated_user_country_code`](crate::client::RustbloxClient::get_authenticated_user_country_code).
+#[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct AuthenticatedUserCountryCode {
+    pub country_code: String
+}
+
+/// Contains information about the authenticated user's country code.
+/// Used in [`get_authenticated_user_roles`](crate::client::RustbloxClient::get_authenticated_user_roles).
+#[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
+pub struct AuthenticatedUserRoles {
+    pub roles: Vec<String>
+}
+
 /// Contains a minimal set of user info provided by
 /// the Roblox API. Used throughout a variety of functions
 /// whenever a small amount of user info is returned as part of
