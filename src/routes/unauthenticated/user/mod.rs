@@ -21,9 +21,6 @@ struct MinimalUserInfoWithReqdObject {
 }
 
 impl RustbloxClient {
-    // ENDPOINTS NOT SUPPORTED:
-    // `GET /v1/display-names/validate`
-
     /// Gets a user's previous usernames, given their user ID.
     ///
     /// # Errors
