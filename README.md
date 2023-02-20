@@ -2,6 +2,13 @@
 
 A Rust library for interacting with the Roblox API
 
+# THIS LIBRARY IS ABANDONED. PLEASE USE (rustyroblox)[https://github.com/clanny/rustyroblox] INSTEAD.
+
+I'm only a college student. I don't have a lot of time to work on this. When I saw (rustyroblox)[https://github.com/clanny/rustyroblox] in development, I figured that I shouldn't waste my time on this when another similar library was in active development.
+I might unarchive this one day, but I also might not. Just go use (rustyroblox)[https://github.com/clanny/rustyroblox]. It's being actively developed and you'll get better support anyways.
+
+--
+
 ## Features
 
 Rustblox intents to support as many of the Roblox API endpoints as possible.
