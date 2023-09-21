@@ -26,7 +26,7 @@ pub struct JoinRequestPage {
 pub struct GroupRole {
     pub id: usize,
     pub name: String,
-    pub description: String,
+    pub description: Option<String>,
     pub rank: u8,
     pub member_count: usize,
 }

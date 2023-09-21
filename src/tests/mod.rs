@@ -3,6 +3,7 @@ mod user_unauth_tests;
 mod group_auth_tests;
 mod auto_reauth;
 mod user_auth_tests;
+mod group_unauth_tests;
 
 use std::fs::{canonicalize, File};
 use std::io::Read;
