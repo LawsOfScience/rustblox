@@ -82,3 +82,13 @@ pub struct UserRoleInGroup {
     pub name: String,
     pub rank: u8,
 }
+
+/// Represents a page of users in a group's role. Used in
+/// [`get_group_role_members`](crate::client::RustbloxClient::get_group_role_members)
+#[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct RoleMembersPage {
+    pub previous_page_cursor: Option<String>,
+    pub next_page_cursor: Option<String>,
+    pub data: Vec<MinimalUserInfo>
+}

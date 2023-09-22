@@ -1,7 +1,8 @@
 use reqwest::Method;
 use crate::client::{RequestComponents, RustbloxClient};
 use crate::error::RequestError;
-use crate::structs::group::{GroupRolesList, UserGroupList};
+use crate::structs::group::{GroupRolesList, RoleMembersPage, UserGroupList};
+use crate::structs::SortOrder;
 
 const BASE_URL: &str = "https://groups.roblox.com";
 
@@ -26,6 +27,55 @@ impl RustbloxClient {
             .make_request::<GroupRolesList>(components, false)
             .await?;
         Ok(ranks)
+    }
+
+    /// Gets the members in a certain role of a certain group.
+    ///
+    /// Note that role_id is *not* the same as the position (i.e 255).
+    /// The role IDs can be obtained through
+    /// [`get_group_roles`](RustbloxClient::get_group_roles).
+    ///
+    /// # Errors
+    ///
+    /// This function returns an error if the request could not be made,
+    /// or if the endpoint responded with an error.
+    ///
+    /// Possible error responses:
+    /// - Status 400 code 1: The group is invalid or doesn't exist
+    /// - Status 403 code 2: The role is invalid or doesn't exist
+    pub async fn get_group_role_members(
+        &mut self,
+        group_id: usize,
+        role_id: usize,
+        limit: Option<usize>,
+        cursor: Option<String>,
+        sort_order: Option<SortOrder>
+    ) -> Result<RoleMembersPage, RequestError> {
+        let real_limit = if limit.is_some() { limit.unwrap() } else { 10 };
+        let mut url =
+            format!("{BASE_URL}/v1/groups/{group_id}/roles/{role_id}/users?limit={real_limit}");
+        if cursor.is_some() {
+            url = format!("{url}&cursor={}", cursor.unwrap());
+        }
+        if sort_order.is_some() {
+            match sort_order.unwrap() {
+                SortOrder::Ascending => url = format!("{url}&sortOrder=Asc"),
+                SortOrder::Descending => url = format!("{url}&sortOrder=Desc"),
+            }
+        }
+
+        let components = RequestComponents {
+            needs_auth: false,
+            method: Method::GET,
+            url: url.clone(),
+            headers: None,
+            body: None,
+        };
+
+        let role_members_data = self
+            .make_request::<RoleMembersPage>(components, false)
+            .await?;
+        Ok(role_members_data)
     }
 
     /// This doesn't need authentication and will be moved at a later date.
