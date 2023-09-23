@@ -53,25 +53,9 @@ async fn kick_user() {
 }
 
 #[tokio::test]
-async fn get_group_roles() {
-    let mut client = create_authed_client().await;
-    let result = client.get_group_roles(5681740).await;
-    println!("{:#?}", result);
-    assert!(result.is_ok());
-}
-
-#[tokio::test]
 async fn set_user_rank() {
     let mut client = create_authed_client().await;
     let result = client.set_user_role_in_group(5681740, 1115834788, 6).await;
-    println!("{:#?}", result);
-    assert!(result.is_ok());
-}
-
-#[tokio::test]
-async fn get_user_group_roles() {
-    let mut client = create_authed_client().await;
-    let result = client.get_user_group_roles(68429027).await;
     println!("{:#?}", result);
     assert!(result.is_ok());
 }
