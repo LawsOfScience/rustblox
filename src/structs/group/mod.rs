@@ -51,9 +51,19 @@ pub struct UserGroupList {
 /// and info about the user's rank/role in it. Used as a component
 /// of [`UserGroupList`].
 #[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
 pub struct UserGroup {
     pub group: UserGroupInfo,
     pub role: UserRoleInGroup,
+    #[serde(default)]
+    pub is_primary_group: bool,
+}
+
+/// Contains information about a group's shout, if there is one.
+#[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
+pub struct GroupShout {
+    pub body: String,
+    pub poster: MinimalUserInfo,
 }
 
 /// Contains all the information about a group that a certain user
@@ -65,13 +75,11 @@ pub struct UserGroupInfo {
     pub name: String,
     pub description: String,
     pub owner: MinimalUserInfo,
-    pub shout: Option<String>,
+    pub shout: Option<GroupShout>,
     pub member_count: usize,
     pub is_builders_club_only: bool,
     pub public_entry_allowed: bool,
     pub has_verified_badge: bool,
-    #[serde(default)]
-    pub is_primary_group: bool,
 }
 
 /// Contains information about a user's role in a certain group. Used
@@ -90,13 +98,12 @@ pub struct UserRoleInGroup {
 pub struct RoleMembersPage {
     pub previous_page_cursor: Option<String>,
     pub next_page_cursor: Option<String>,
-    pub data: Vec<MinimalUserInfo>
+    pub data: Vec<MinimalUserInfo>,
 }
 
 /// Contains information about a member of a group. Used as a component
 /// of [`GroupMembersPage`](GroupMembersPage)
 #[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
-#[serde(rename_all = "camelCase")]
 pub struct GroupMemberInfo {
     pub user: MinimalUserInfo,
     pub role: GroupRole,
@@ -109,5 +116,5 @@ pub struct GroupMemberInfo {
 pub struct GroupMembersPage {
     pub previous_page_cursor: Option<String>,
     pub next_page_cursor: Option<String>,
-    pub data: Vec<GroupMemberInfo>
+    pub data: Vec<GroupMemberInfo>,
 }
