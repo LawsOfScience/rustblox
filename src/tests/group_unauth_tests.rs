@@ -1,6 +1,22 @@
 use crate::client::builder::RustbloxClientBuilder;
 
 #[tokio::test]
+async fn get_group_members() {
+    let mut client = RustbloxClientBuilder::new()
+        .build()
+        .unwrap();
+    let result = client
+        .get_group_members(
+            5681740,
+            None,
+            None,
+            None
+        ).await;
+    println!("{:#?}", result);
+    assert!(result.is_ok());
+}
+
+#[tokio::test]
 async fn get_group_roles() {
     let mut client = RustbloxClientBuilder::new()
         .build()

@@ -13,7 +13,7 @@
 - [x] Exile user `DELETE /v1/groups/{groupId}/users/{userId}`
 - [x] Update a user's role in a group `PATCH /v1/groups/{groupId}/users/{userId}`
 - [x] Get roles `GET /v1/groups/{groupId}/roles` (NA)
-- [ ] Get users in a role `GET /v1/groups/{groupId}/roles/{roleSetId}/users` (NA)
-- [ ] Get list of members `GET /v1/groups/{groupId}/users` (NA)
+- [x] Get users in a role `GET /v1/groups/{groupId}/roles/{roleSetId}/users` (NA)
+- [x] Get list of members `GET /v1/groups/{groupId}/users` (NA)
 - [ ] Get groups of authed user's friends `GET /v1/users/{userId}/friends/groups/roles` (NA)
 - [x] Get group roles for user `GET /v1/users/{userId}/groups/roles` (NA)

@@ -1,12 +1,54 @@
-use reqwest::Method;
 use crate::client::{RequestComponents, RustbloxClient};
 use crate::error::RequestError;
-use crate::structs::group::{GroupRolesList, RoleMembersPage, UserGroupList};
+use crate::structs::group::{GroupMembersPage, GroupRolesList, RoleMembersPage, UserGroupList};
 use crate::structs::SortOrder;
+use reqwest::Method;
 
 const BASE_URL: &str = "https://groups.roblox.com";
 
 impl RustbloxClient {
+    /// Gets a list of the group's members.
+    ///
+    /// # Errors
+    ///
+    /// This function returns an error if the request could not be made,
+    /// or if the endpoint responded with an error.
+    ///
+    /// Possible error responses:
+    /// - Status 400 code 1: The group is invalid or doesn't exist
+    pub async fn get_group_members(
+        &mut self,
+        group_id: usize,
+        limit: Option<usize>,
+        cursor: Option<String>,
+        sort_order: Option<SortOrder>,
+    ) -> Result<GroupMembersPage, RequestError> {
+        let real_limit = if limit.is_some() { limit.unwrap() } else { 10 };
+        let mut url = format!("{BASE_URL}/v1/groups/{group_id}/users?limit={real_limit}");
+        if cursor.is_some() {
+            url = format!("{url}&cursor={}", cursor.unwrap());
+        }
+        if sort_order.is_some() {
+            match sort_order.unwrap() {
+                SortOrder::Ascending => url = format!("{url}&sortOrder=Asc"),
+                SortOrder::Descending => url = format!("{url}&sortOrder=Desc"),
+            }
+        }
+
+        let components = RequestComponents {
+            needs_auth: false,
+            method: Method::GET,
+            url,
+            headers: None,
+            body: None,
+        };
+        let users = self
+            .make_request::<GroupMembersPage>(components, false)
+            .await?;
+
+        Ok(users)
+    }
+
     /// Gets a list of the group's roles.
     ///
     /// # Errors

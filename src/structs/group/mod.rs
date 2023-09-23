@@ -28,7 +28,7 @@ pub struct GroupRole {
     pub name: String,
     pub description: Option<String>,
     pub rank: u8,
-    pub member_count: usize,
+    pub member_count: Option<usize>,
 }
 
 /// Represents a list of roles in a group. Used in
@@ -91,4 +91,23 @@ pub struct RoleMembersPage {
     pub previous_page_cursor: Option<String>,
     pub next_page_cursor: Option<String>,
     pub data: Vec<MinimalUserInfo>
+}
+
+/// Contains information about a member of a group. Used as a component
+/// of [`GroupMembersPage`](GroupMembersPage)
+#[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct GroupMemberInfo {
+    pub user: MinimalUserInfo,
+    pub role: GroupRole,
+}
+
+/// Represents a page of information about the members of a group.
+/// Used in [`get_group_members`](crate::client::RustbloxClient::get_group_members)
+#[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct GroupMembersPage {
+    pub previous_page_cursor: Option<String>,
+    pub next_page_cursor: Option<String>,
+    pub data: Vec<GroupMemberInfo>
 }
