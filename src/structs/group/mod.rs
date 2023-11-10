@@ -2,21 +2,11 @@ use crate::structs::user::MinimalUserInfo;
 
 /// Represents a join request to a group. Used in
 /// [`get_user_join_request`](crate::client::RustbloxClient::get_user_join_request)
-/// as well as in [`JoinRequestPage`].
+/// as well as in [`batch_get_requests`](crate::client::RustbloxClient::batch_get_requests).
 #[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
 pub struct JoinRequest {
     pub requester: MinimalUserInfo,
     pub created: String,
-}
-
-/// Represents a page of join requests to a group. Used in
-/// [`batch_get_requests`](crate::client::RustbloxClient::batch_get_requests).
-#[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
-#[serde(rename_all = "camelCase")]
-pub struct JoinRequestPage {
-    pub previous_page_cursor: Option<String>,
-    pub next_page_cursor: Option<String>,
-    pub data: Vec<JoinRequest>,
 }
 
 /// Represents a role in a group. Used as a component
@@ -91,30 +81,10 @@ pub struct UserRoleInGroup {
     pub rank: u8,
 }
 
-/// Represents a page of users in a group's role. Used in
-/// [`get_group_role_members`](crate::client::RustbloxClient::get_group_role_members)
-#[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
-#[serde(rename_all = "camelCase")]
-pub struct RoleMembersPage {
-    pub previous_page_cursor: Option<String>,
-    pub next_page_cursor: Option<String>,
-    pub data: Vec<MinimalUserInfo>,
-}
-
-/// Contains information about a member of a group. Used as a component
-/// of [`GroupMembersPage`](GroupMembersPage)
+/// Contains information about a member of a group.
+/// Used in [`get_group_members`](crate::client::RustbloxClient::get_group_members)
 #[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
 pub struct GroupMemberInfo {
     pub user: MinimalUserInfo,
     pub role: GroupRole,
-}
-
-/// Represents a page of information about the members of a group.
-/// Used in [`get_group_members`](crate::client::RustbloxClient::get_group_members)
-#[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
-#[serde(rename_all = "camelCase")]
-pub struct GroupMembersPage {
-    pub previous_page_cursor: Option<String>,
-    pub next_page_cursor: Option<String>,
-    pub data: Vec<GroupMemberInfo>,
 }

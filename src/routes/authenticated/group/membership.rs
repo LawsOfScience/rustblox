@@ -2,7 +2,8 @@ use reqwest::header::{HeaderMap, HeaderValue};
 use reqwest::Method;
 use crate::client::{RequestComponents, RustbloxClient};
 use crate::error::{RequestError, RobloxApiError, RobloxApiErrors};
-use crate::structs::group::{GroupRole, JoinRequest, JoinRequestPage};
+use crate::structs::group::{GroupRole, JoinRequest};
+use crate::structs::Page;
 
 const BASE_URL: &str = "https://groups.roblox.com";
 
@@ -98,7 +99,7 @@ impl RustbloxClient {
     /// This function will error if:
     /// - You do not have a `.ROBLOSECURITY` cookie set.
     /// - The endpoint responds with an error.
-    pub async fn batch_get_requests(&mut self, group_id: usize) -> Result<Option<JoinRequestPage>, RequestError> {
+    pub async fn batch_get_requests(&mut self, group_id: usize) -> Result<Option<Page<JoinRequest>>, RequestError> {
         let url = format!("{BASE_URL}/v1/groups/{group_id}/join-requests");
 
         let components = RequestComponents {
@@ -109,7 +110,7 @@ impl RustbloxClient {
             body: None
         };
         let join_request_data = self
-            .make_request::<Option<JoinRequestPage>>(components, false)
+            .make_request::<Option<Page<JoinRequest>>>(components, false)
             .await?;
 
         Ok(join_request_data)
