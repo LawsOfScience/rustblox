@@ -81,7 +81,7 @@ pub struct MinimalUserInfoWithRequestedName {
 
 /// Contains a minimal set of user info provided by
 /// the Roblox API, along with the user's previous usernames.
-/// Used as a component of [`UserSearchPage`].
+/// Used primarily in [`search_user`](crate::client::RustbloxClient::search_user).
 #[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct MinimalUserInfoWithPreviousNames {
@@ -92,31 +92,9 @@ pub struct MinimalUserInfoWithPreviousNames {
     pub name: String,
 }
 
-/// Represents a page of search results when searching for
-/// a user by username. Used primarily in
-/// [`search_user`](crate::client::RustbloxClient::search_user).
-#[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
-#[serde(rename_all = "camelCase")]
-pub struct UserSearchPage {
-    pub previous_page_cursor: Option<String>,
-    pub next_page_cursor: Option<String>,
-    pub data: Vec<MinimalUserInfoWithPreviousNames>,
-}
-
-/// Represents a page of search results when searching for
-/// a user's previous usernames. Used primarily in
-/// [`get_previous_usernames`](crate::client::RustbloxClient::get_previous_usernames).
-#[allow(dead_code, non_snake_case)]
-#[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
-#[serde(rename_all = "camelCase")]
-pub struct PreviousUsernamesPage {
-    previous_page_cursor: Option<String>,
-    next_page_cursor: Option<String>,
-    data: Vec<PreviousUsername>,
-}
-
 /// Represents a user's previous username. Used as a component
-/// of [`PreviousUsernamesPage`].
+/// of [`PreviousUsernamesPage`]. Used primarily in
+/// [`get_previous_usernames`](crate::client::RustbloxClient::get_previous_usernames).
 #[allow(dead_code, non_snake_case)]
 #[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
 pub struct PreviousUsername {

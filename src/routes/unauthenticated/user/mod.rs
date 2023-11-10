@@ -1,8 +1,8 @@
 use crate::client::RequestComponents;
 use crate::client::RustbloxClient;
 use crate::error::RequestError;
-use crate::structs::user::{MinimalUserInfo, MinimalUserInfoWithRequestedName, PreviousUsernamesPage, UserInfo, UserSearchPage};
-use crate::structs::SortOrder;
+use crate::structs::user::{MinimalUserInfo, MinimalUserInfoWithPreviousNames, MinimalUserInfoWithRequestedName, PreviousUsername, UserInfo};
+use crate::structs::{Page, SortOrder};
 use reqwest::header::{HeaderMap, HeaderValue};
 use reqwest::Method;
 
@@ -35,7 +35,7 @@ impl RustbloxClient {
         limit: Option<usize>,
         cursor: Option<String>,
         sort_order: Option<SortOrder>,
-    ) -> Result<PreviousUsernamesPage, RequestError> {
+    ) -> Result<Page<PreviousUsername>, RequestError> {
         let real_limit = if limit.is_some() { limit.unwrap() } else { 10 };
         let mut url = format!("{BASE_URL}/users/{id}/username-history?limit={real_limit}");
         if cursor.is_some() {
@@ -57,7 +57,7 @@ impl RustbloxClient {
         };
 
         let previous_usernames_data = self
-            .make_request::<PreviousUsernamesPage>(components, false)
+            .make_request::<Page<PreviousUsername>>(components, false)
             .await?;
         Ok(previous_usernames_data)
     }
@@ -184,7 +184,7 @@ impl RustbloxClient {
         username: String,
         limit: Option<usize>,
         page_cursor: Option<String>,
-    ) -> Result<UserSearchPage, RequestError> {
+    ) -> Result<Page<MinimalUserInfoWithPreviousNames>, RequestError> {
         let real_limit = if limit.is_some() { limit.unwrap() } else { 10 };
         let mut url = format!(
             "{BASE_URL}/users/search?keyword={username}&limit={real_limit}"
@@ -202,7 +202,7 @@ impl RustbloxClient {
         };
 
         let response = self
-            .make_request::<UserSearchPage>(components, false)
+            .make_request::<Page<MinimalUserInfoWithPreviousNames>>(components, false)
             .await?;
 
         Ok(response)
