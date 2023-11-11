@@ -19,7 +19,7 @@ some things will be missed or fall through the cracks, especially in regard to
 
 Rustblox will start by working with endpoints that do not require authentication,
 and will then implement authentication and support the endpoints that require it.
-Authentication will be done via the .ROBLOSECURITY cookie. See [here](#.ROBLOSECURITY-Cookies)
+Authentication will be done via the .ROBLOSECURITY cookie. See [here](#roblosecurity-cookies)
 for more information.
 
 ## Getting Started
@@ -29,7 +29,7 @@ TBD
 Will most likely work by creating a `RustbloxClient` and interacting with that.
 
 ## MSRV (Minimum Supported Rust Version)
-The current MSRV is 1.62.1.
+The current MSRV is 1.63.0.
 
 ## Notes
 
