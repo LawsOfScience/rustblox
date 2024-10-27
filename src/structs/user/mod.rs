@@ -70,8 +70,7 @@ pub struct MinimalUserInfo {
 // DESPITE THEM LITERALLY HAVING THE SAME DATA.
 
 /// Represents a user's previous username. Used as a component
-/// of [`PreviousUsernamesPage`]. Used primarily in
-/// [`get_previous_usernames`](crate::client::RustbloxClient::get_previous_usernames).
+/// Used primarily in [`get_previous_usernames`](crate::client::RustbloxClient::get_previous_usernames).
 #[allow(dead_code, non_snake_case)]
 #[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
 pub struct PreviousUsername {
