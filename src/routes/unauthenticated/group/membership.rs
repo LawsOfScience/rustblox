@@ -1,8 +1,9 @@
 use crate::client::{RequestComponents, RustbloxClient};
 use crate::error::RequestError;
-use crate::structs::group::{GroupMembersPage, GroupRolesList, RoleMembersPage, UserGroupList};
-use crate::structs::SortOrder;
+use crate::structs::group::{GroupMemberInfo, GroupRolesList, UserGroupList};
+use crate::structs::{Page, SortOrder};
 use reqwest::Method;
+use crate::structs::user::MinimalUserInfo;
 
 const BASE_URL: &str = "https://groups.roblox.com";
 
@@ -22,7 +23,7 @@ impl RustbloxClient {
         limit: Option<usize>,
         cursor: Option<String>,
         sort_order: Option<SortOrder>,
-    ) -> Result<GroupMembersPage, RequestError> {
+    ) -> Result<Page<GroupMemberInfo>, RequestError> {
         let real_limit = if limit.is_some() { limit.unwrap() } else { 10 };
         let mut url = format!("{BASE_URL}/v1/groups/{group_id}/users?limit={real_limit}");
         if cursor.is_some() {
@@ -43,7 +44,7 @@ impl RustbloxClient {
             body: None,
         };
         let users = self
-            .make_request::<GroupMembersPage>(components, false)
+            .make_request::<Page<GroupMemberInfo>>(components, false)
             .await?;
 
         Ok(users)
@@ -92,7 +93,7 @@ impl RustbloxClient {
         limit: Option<usize>,
         cursor: Option<String>,
         sort_order: Option<SortOrder>
-    ) -> Result<RoleMembersPage, RequestError> {
+    ) -> Result<Page<MinimalUserInfo>, RequestError> {
         let real_limit = if limit.is_some() { limit.unwrap() } else { 10 };
         let mut url =
             format!("{BASE_URL}/v1/groups/{group_id}/roles/{role_id}/users?limit={real_limit}");
@@ -115,7 +116,7 @@ impl RustbloxClient {
         };
 
         let role_members_data = self
-            .make_request::<RoleMembersPage>(components, false)
+            .make_request::<Page<MinimalUserInfo>>(components, false)
             .await?;
         Ok(role_members_data)
     }
