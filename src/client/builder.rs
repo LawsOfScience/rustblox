@@ -1,3 +1,5 @@
+use std::sync::{Arc, RwLock};
+
 use crate::client::RustbloxClient;
 use crate::error::ClientError;
 
@@ -58,7 +60,7 @@ impl RustbloxClientBuilder {
         Ok(RustbloxClient {
             reqwest_client: built_client,
             roblox_cookie: self.roblox_cookie,
-            csrf_token: None,
+            csrf_token: Arc::new(RwLock::new(None)),
             auto_reauth: self.auto_reauth,
         })
     }

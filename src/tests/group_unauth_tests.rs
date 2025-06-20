@@ -2,7 +2,7 @@ use crate::client::builder::RustbloxClientBuilder;
 
 #[tokio::test]
 async fn get_group_members() {
-    let mut client = RustbloxClientBuilder::new()
+    let client = RustbloxClientBuilder::new()
         .build()
         .unwrap();
     let result = client
@@ -18,7 +18,7 @@ async fn get_group_members() {
 
 #[tokio::test]
 async fn get_group_roles() {
-    let mut client = RustbloxClientBuilder::new()
+    let client = RustbloxClientBuilder::new()
         .build()
         .unwrap();
     let result = client.get_group_roles(5681740).await;
@@ -28,7 +28,7 @@ async fn get_group_roles() {
 
 #[tokio::test]
 async fn get_user_group_roles() {
-    let mut client = RustbloxClientBuilder::new()
+    let client = RustbloxClientBuilder::new()
         .build()
         .unwrap();
     let result = client.get_user_group_roles(68429027).await;
@@ -38,7 +38,7 @@ async fn get_user_group_roles() {
 
 #[tokio::test]
 async fn get_members_in_group_role() {
-    let mut client = RustbloxClientBuilder::new()
+    let client = RustbloxClientBuilder::new()
         .build()
         .unwrap();
     let result = client.get_group_role_members(

@@ -3,7 +3,7 @@ use crate::client::RustbloxClient;
 use crate::structs::SortOrder;
 
 async fn create_unauthed_client() -> RustbloxClient {
-    let mut client = RustbloxClientBuilder::new()
+    let client = RustbloxClientBuilder::new()
         .build()
         .expect("Error building the client");
 
@@ -13,7 +13,7 @@ async fn create_unauthed_client() -> RustbloxClient {
 
 #[tokio::test]
 async fn get_user_info() {
-    let mut client = create_unauthed_client().await;
+    let client = create_unauthed_client().await;
     let user_info = client.get_user_info(100534123).await;
 
     if let Err(why) = user_info {
@@ -26,7 +26,7 @@ async fn get_user_info() {
 
 #[tokio::test]
 async fn get_multiple_ids() {
-    let mut client = create_unauthed_client().await;
+    let client = create_unauthed_client().await;
     let user_ids = vec![68429027, 665352667, 165383308, 203539400];
 
     let user_info = client.get_users_from_ids(user_ids, true).await;
@@ -40,7 +40,7 @@ async fn get_multiple_ids() {
 
 #[tokio::test]
 async fn get_multiple_usernames() {
-    let mut client = create_unauthed_client().await;
+    let client = create_unauthed_client().await;
     let usernames = vec!["Aerasto", "TheWildDeveloper", "tannibus"];
 
     let user_info = client.get_users_from_usernames(usernames, true).await;
@@ -54,7 +54,7 @@ async fn get_multiple_usernames() {
 
 #[tokio::test]
 async fn get_previous_usernames() {
-    let mut client = create_unauthed_client().await;
+    let client = create_unauthed_client().await;
 
     let previous_usernames = client
         .get_previous_usernames(68429027, None, None, Some(SortOrder::Descending))
@@ -69,7 +69,7 @@ async fn get_previous_usernames() {
 
 #[tokio::test]
 async fn search_user() {
-    let mut client = create_unauthed_client().await;
+    let client = create_unauthed_client().await;
 
     let user_info = client
         .search_user("TheWildDeveloper".to_string(), None, None)

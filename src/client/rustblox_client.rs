@@ -2,6 +2,7 @@ use crate::error::{ClientError, RequestError, RobloxApiError, RobloxApiErrors};
 use reqwest::header::HeaderMap;
 use reqwest::Method;
 use serde::de::DeserializeOwned;
+use std::sync::{Arc, RwLock};
 
 pub(crate) struct RequestComponents {
     pub(crate) needs_auth: bool,
@@ -17,20 +18,33 @@ pub(crate) struct RequestComponents {
 pub struct RustbloxClient {
     pub(crate) reqwest_client: reqwest::Client,
     pub(crate) roblox_cookie: Option<String>,
-    pub(crate) csrf_token: Option<String>,
+    pub(crate) csrf_token: Arc<RwLock<Option<String>>>,
     pub(crate) auto_reauth: bool,
 }
 
 impl RustbloxClient {
     #[must_use]
-    pub fn csrf_token(&self) -> Option<&String> {
-        self.csrf_token.as_ref()
+    pub fn csrf_token(&self) -> Option<String> {
+        match self.csrf_token.read() {
+            Ok(inner) => inner.clone(),
+            Err(why) => {
+                warn!("The CSRF RwLock is poisoned:\n{why}");
+                None
+            }
+        }
     }
 
     /// Returns a boolean representing this [`RustbloxClient`]'s authentication status.
     #[must_use]
     pub fn is_authenticated(&self) -> bool {
-        self.roblox_cookie().is_some() && self.csrf_token.is_some()
+        let csrf = match self.csrf_token.read() {
+            Ok(inner) => inner.is_some(),
+            Err(why) => {
+                warn!("The CSRF RwLock is poisoned:\n{why}");
+                false
+            }
+        };
+        self.roblox_cookie().is_some() && csrf
     }
 
     /// Logs the client in.
@@ -46,7 +60,7 @@ impl RustbloxClient {
     /// # Panics
     ///
     /// This function cannot panic.
-    pub async fn login(&mut self) -> Result<(), ClientError> {
+    pub async fn login(&self) -> Result<(), ClientError> {
         // Initial connection test can come first
         // and return early if no cookie is set
         self.reqwest_client
@@ -93,7 +107,14 @@ impl RustbloxClient {
             .map_err(|e| ClientError::LoginFailed(format!("Failed to parse CSRF token:\n{e}")))?
             .to_string();
 
-        self.csrf_token = Some(csrf_string);
+        let mut csrf = match self.csrf_token.write() {
+            Ok(inner) => inner,
+            Err(why) => {
+                warn!("The CSRF RwLock is poisoned:\n{why}");
+                return Err(ClientError::LoginFailed("The CSRF RwLock is poisoned".into()));
+            }
+        };
+        *csrf = Some(csrf_string);
 
         Ok(())
     }
@@ -119,7 +140,7 @@ impl RustbloxClient {
     /// or was not enabled. In either case, you will get a [`RequestError::ReauthenticationFailed`].
     #[async_recursion::async_recursion]
     pub(crate) async fn make_request<T>(
-        &mut self,
+        &self,
         components: RequestComponents,
         tried_reauth: bool,
     ) -> Result<T, RequestError>

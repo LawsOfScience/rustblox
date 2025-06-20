@@ -30,7 +30,7 @@ impl RustbloxClient {
     /// Possible error responses:
     /// - Status 400 code 3: The user ID is invalid
     pub async fn get_previous_usernames(
-        &mut self,
+        &self,
         id: usize,
         limit: Option<usize>,
         cursor: Option<String>,
@@ -70,7 +70,7 @@ impl RustbloxClient {
     ///
     /// Possible error responses:
     /// - Status 404 code 3: The user ID is invalid
-    pub async fn get_user_info(&mut self, id: usize) -> Result<UserInfo, RequestError> {
+    pub async fn get_user_info(&self, id: usize) -> Result<UserInfo, RequestError> {
         let url = format!("{BASE_URL}/users/{id}");
         let components = RequestComponents {
             needs_auth: false,
@@ -94,7 +94,7 @@ impl RustbloxClient {
     /// Possible error responses:
     /// - Status 400 code 1: Too many IDs
     pub async fn get_users_from_ids(
-        &mut self,
+        &self,
         ids: Vec<usize>,
         exclude_banned: bool,
     ) -> Result<Vec<MinimalUserInfo>, RequestError> {
@@ -136,7 +136,7 @@ impl RustbloxClient {
     /// Possible error responses:
     /// - Status 400 code 2: Too many usernames
     pub async fn get_users_from_usernames(
-        &mut self,
+        &self,
         usernames: Vec<&str>,
         exclude_banned: bool,
     ) -> Result<Vec<MinimalUserInfo>, RequestError> {
@@ -180,7 +180,7 @@ impl RustbloxClient {
     /// - Status 400 code 6: The username (keyword) is too short
     /// - Status 429 code 4: Too many requests
     pub async fn search_user(
-        &mut self,
+        &self,
         username: String,
         limit: Option<usize>,
         page_cursor: Option<String>,

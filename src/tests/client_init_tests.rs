@@ -10,7 +10,7 @@ fn build_client() {
 
 #[tokio::test]
 async fn build_and_ping() {
-    let mut client = RustbloxClientBuilder::new()
+    let client = RustbloxClientBuilder::new()
         .build()
         .expect("Had an error building the client");
     let ping = client.login().await;
@@ -19,7 +19,7 @@ async fn build_and_ping() {
 
 #[tokio::test]
 async fn build_and_login() {
-    let mut client = RustbloxClientBuilder::new()
+    let client = RustbloxClientBuilder::new()
         .insert_cookie(&get_cookie())
         .expect("Invalid cookie")
         .build()

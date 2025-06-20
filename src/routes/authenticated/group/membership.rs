@@ -17,7 +17,7 @@ impl RustbloxClient {
     /// This function will error if:
     /// - You do not have a `.ROBLOSECURITY` cookie set.
     /// - The endpoint responds with an error.
-    pub async fn accept_user_join_request(&mut self, group_id: usize, user_id: usize) -> Result<(), RequestError> {
+    pub async fn accept_user_join_request(&self, group_id: usize, user_id: usize) -> Result<(), RequestError> {
         let url = format!("{BASE_URL}/v1/groups/{group_id}/join-requests/users/{user_id}");
 
         let mut headers = HeaderMap::new();
@@ -47,7 +47,7 @@ impl RustbloxClient {
     /// This function will error if:
     /// - You do not have a `.ROBLOSECURITY` cookie set.
     /// - The endpoint responds with an error.
-    pub async fn batch_accept_requests(&mut self, group_id: usize) -> Result<(), RequestError> {
+    pub async fn batch_accept_requests(&self, group_id: usize) -> Result<(), RequestError> {
         let url = format!("{BASE_URL}/v1/groups/{group_id}/join-requests");
 
         let components = RequestComponents {
@@ -73,7 +73,7 @@ impl RustbloxClient {
     /// This function will error if:
     /// - You do not have a `.ROBLOSECURITY` cookie set.
     /// - The endpoint responds with an error.
-    pub async fn batch_deny_requests(&mut self, group_id: usize) -> Result<(), RequestError> {
+    pub async fn batch_deny_requests(&self, group_id: usize) -> Result<(), RequestError> {
         let url = format!("{BASE_URL}/v1/groups/{group_id}/join-requests");
 
         let components = RequestComponents {
@@ -99,7 +99,7 @@ impl RustbloxClient {
     /// This function will error if:
     /// - You do not have a `.ROBLOSECURITY` cookie set.
     /// - The endpoint responds with an error.
-    pub async fn batch_get_requests(&mut self, group_id: usize) -> Result<Option<Page<JoinRequest>>, RequestError> {
+    pub async fn batch_get_requests(&self, group_id: usize) -> Result<Option<Page<JoinRequest>>, RequestError> {
         let url = format!("{BASE_URL}/v1/groups/{group_id}/join-requests");
 
         let components = RequestComponents {
@@ -125,7 +125,7 @@ impl RustbloxClient {
     /// This function will error if:
     /// - You do not have a `.ROBLOSECURITY` cookie set.
     /// - The endpoint responds with an error.
-    pub async fn deny_user_join_request(&mut self, group_id: usize, user_id: usize) -> Result<(), RequestError> {
+    pub async fn deny_user_join_request(&self, group_id: usize, user_id: usize) -> Result<(), RequestError> {
         let url = format!("{BASE_URL}/v1/groups/{group_id}/join-requests/users/{user_id}");
 
         let components = RequestComponents {
@@ -153,7 +153,7 @@ impl RustbloxClient {
     /// This function will error if:
     /// - You do not have a `.ROBLOSECURITY` cookie set.
     /// - The endpoint responds with an error.
-    pub async fn get_user_join_request(&mut self, group_id: usize, user_id: usize) -> Result<Option<JoinRequest>, RequestError> {
+    pub async fn get_user_join_request(&self, group_id: usize, user_id: usize) -> Result<Option<JoinRequest>, RequestError> {
         let url = format!("{BASE_URL}/v1/groups/{group_id}/join-requests/users/{user_id}");
 
         let components = RequestComponents {
@@ -179,7 +179,7 @@ impl RustbloxClient {
     /// This function will error if:
     /// - You do not have a `.ROBLOSECURITY` cookie set.
     /// - The endpoint responds with an error.
-    pub async fn kick_user(&mut self, group_id: usize, user_id: usize) -> Result<(), RequestError> {
+    pub async fn kick_user(&self, group_id: usize, user_id: usize) -> Result<(), RequestError> {
         let url = format!("{BASE_URL}/v1/groups/{group_id}/users/{user_id}");
 
         let components = RequestComponents {
@@ -208,7 +208,7 @@ impl RustbloxClient {
     /// - You do not have a `.ROBLOSECURITY` cookie set.
     /// - The endpoint responds with an error.
     /// - No such role exists in the group.
-    pub async fn set_user_role_in_group(&mut self, group_id: usize, user_id: usize, role_rank_id: u8) -> Result<(), RequestError> {
+    pub async fn set_user_role_in_group(&self, group_id: usize, user_id: usize, role_rank_id: u8) -> Result<(), RequestError> {
         let url = format!("{BASE_URL}/v1/groups/{group_id}/users/{user_id}");
 
         let roles = self.get_group_roles(group_id).await?;

@@ -18,7 +18,7 @@ impl RustbloxClient {
     /// Possible error responses:
     /// - Status 400 code 1: The group is invalid or doesn't exist
     pub async fn get_group_members(
-        &mut self,
+        &self,
         group_id: usize,
         limit: Option<usize>,
         cursor: Option<String>,
@@ -56,7 +56,7 @@ impl RustbloxClient {
     ///
     /// This function will error if:
     /// - The endpoint responds with an error.
-    pub async fn get_group_roles(&mut self, group_id: usize) -> Result<GroupRolesList, RequestError> {
+    pub async fn get_group_roles(&self, group_id: usize) -> Result<GroupRolesList, RequestError> {
         let url = format!("{BASE_URL}/v1/groups/{group_id}/roles");
 
         let components = RequestComponents {
@@ -87,7 +87,7 @@ impl RustbloxClient {
     /// - Status 400 code 1: The group is invalid or doesn't exist
     /// - Status 403 code 2: The role is invalid or doesn't exist
     pub async fn get_group_role_members(
-        &mut self,
+        &self,
         group_id: usize,
         role_id: usize,
         limit: Option<usize>,
@@ -127,7 +127,7 @@ impl RustbloxClient {
     ///
     /// This function will error if:
     /// - The endpoint responds with an error.
-    pub async fn get_user_group_roles(&mut self, user_id: usize) -> Result<UserGroupList, RequestError> {
+    pub async fn get_user_group_roles(&self, user_id: usize) -> Result<UserGroupList, RequestError> {
         let url = format!("{BASE_URL}/v1/users/{user_id}/groups/roles");
 
         let components = RequestComponents {
