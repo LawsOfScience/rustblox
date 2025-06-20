@@ -4,9 +4,9 @@ A Rust library for interacting with the Roblox API
 
 # Project Status
 
-I've recently found some time and I decided that I'd revive this project.
-I can't guarantee frequency of updates, but the project is now officially unarchived.
-Pull requests are always welcome and will help features get added faster!
+So the last update I made here, I said I had "found time" and
+then proceeded to not work on this too much. I won't make guarantees,
+but I may continue to work on this.
 
 ---
 
@@ -17,16 +17,51 @@ Most of the Roblox API has *good enough* documentation, but it is possible that
 some things will be missed or fall through the cracks, especially in regard to
 `realtime.roblox.com` (as that has little documentation that I've found).
 
-Rustblox will start by working with endpoints that do not require authentication,
-and will then implement authentication and support the endpoints that require it.
+Rustblox will primarily try to support endpoints that are useful to automated accounts.
 Authentication will be done via the .ROBLOSECURITY cookie. See [here](#roblosecurity-cookies)
 for more information.
 
 ## Getting Started
 
-TBD
+To get started, you need a `RustbloxClient`, which you can get from a `RustbloxClientBuilder`.
 
-Will most likely work by creating a `RustbloxClient` and interacting with that.
+```rust
+// -- snip --
+use rustblox::builder::RustbloxClientBuilder;
+
+let client = RustbloxClientBuilder::new()
+    .build();
+// -- snip --
+```
+
+This will build a client without any authentication capabilities. If you desire
+the ability to use authentication, you will need a [.ROBLOSECURITY cookie](#roblosecurity-cookies).
+Once you have one, you can build a `RustbloxClient` as follows:
+
+```rust
+// -- snip --
+use rustblox::builder::RustbloxClientBuilder;
+
+let mut client = RustbloxClientBuilder::new()
+    .insert_cookie("<YOUR COOKIE>")
+    .build();
+// -- snip --
+```
+
+Once you have a `RustbloxClient`, you can make requests to the Roblox API using the client directly.
+Eventually, feature flags will gate which API functions are added in.
+
+``` rust
+// -- snip --
+let client = RustbloxClientBuilder::new().build();
+let result = client.get_user_info(1).await;
+println!("{:#?}", result);
+// -- snip --
+```
+
+If using an authenticated client, the default behavior is to return an Err on any failure to authenticate.
+If you'd like to automatically re-attempt (once) to refresh your X-CSRF-TOKEN, you can use the
+`automatic_reauthentication()` method on the `RustbloxClientBuilder` to set your preference.
 
 ## MSRV (Minimum Supported Rust Version)
 The current MSRV is 1.63.0.
