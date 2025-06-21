@@ -19,15 +19,14 @@ async fn bad_cookie_test() {
 
 #[tokio::test]
 async fn bad_token_refresh() {
-    // Great, the group endpoints return a 401 if your x-csrf-token is bad...
-    // guess I'll need to adjust code later
     let client = RustbloxClient {
         reqwest_client: Default::default(),
-        roblox_cookie: Some(get_cookie()),
+        roblox_cookie: Some(format!(".ROBLOSECURITY={}", get_cookie())),
         csrf_token: Arc::new(RwLock::new(Some("bad-token".to_string()))),
         auto_reauth: true
     };
 
     let result = client.batch_get_requests(5681740).await;
     println!("{:#?}", result);
+    assert!(result.is_ok());
 }
