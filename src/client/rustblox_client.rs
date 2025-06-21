@@ -18,8 +18,29 @@ pub(crate) struct RequestComponents {
 pub struct RustbloxClient {
     pub(crate) reqwest_client: reqwest::Client,
     pub(crate) roblox_cookie: Option<String>,
-    pub(crate) csrf_token: Arc<RwLock<Option<String>>>,
     pub(crate) auto_reauth: bool,
+
+    // So, why Arc<RwLock<Option<String>>>? Let's break this down.
+    // TL;DR: session reusability within one client.
+    //
+    // So, imagine you have an async API that needs your Client in two or more
+    // endpoints. You COULD make a new Client for each endpoint, but if your
+    // client needs authentication, you might end up getting ratelimited as you
+    // continually try to fetch an X-CSRF-TOKEN.
+    // This is a solution -- using one Client instance and sharing the csrf token
+    // with an Arc<RwLock<Option<String>>> to avoid needing to fetch it all the time.
+    // - Arc: for sharing the memory
+    // - RwLock: to gate access. Reads are also more common than writes since
+    //           csrf tokens aren't extremely ephemeral.
+    //   - Also prevents make_request() needing to take &mut self, which would
+    //     effectively only permit one request to be processed at a time (subpar!)
+    //     - And yes, I do believe the &mut self issue still appears if I instead
+    //       make the user have their own Arc<Mutex<RustbloxClient>>
+    // - Option<String>: if you aren't using authentication, you don't need a csrf token
+    //
+    // I am open to being corrected if this is a terrible solution and
+    // I should do it another way.
+    pub(crate) csrf_token: Arc<RwLock<Option<String>>>,
 }
 
 impl RustbloxClient {

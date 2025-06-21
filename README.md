@@ -45,6 +45,10 @@ use rustblox::builder::RustbloxClientBuilder;
 let mut client = RustbloxClientBuilder::new()
     .insert_cookie("<YOUR COOKIE>")
     .build();
+let login_result = client
+    .login()
+    .await
+    .unwrap();
 // -- snip --
 ```
 
