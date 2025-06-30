@@ -29,7 +29,7 @@ pub struct MinimalAuthenticatedUser {
 #[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct AuthenticatedUserAgeBracket {
-    pub age_bracket: usize
+    pub age_bracket: usize,
 }
 
 /// Contains information about the authenticated user's country code.
@@ -37,14 +37,14 @@ pub struct AuthenticatedUserAgeBracket {
 #[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct AuthenticatedUserCountryCode {
-    pub country_code: String
+    pub country_code: String,
 }
 
 /// Contains information about the authenticated user's country code.
 /// Used in [`get_authenticated_user_roles`](crate::client::RustbloxClient::get_authenticated_user_roles).
 #[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
 pub struct AuthenticatedUserRoles {
-    pub roles: Vec<String>
+    pub roles: Vec<String>,
 }
 
 /// Contains a minimal set of user info provided by
@@ -76,4 +76,3 @@ pub struct MinimalUserInfo {
 pub struct PreviousUsername {
     name: String,
 }
-

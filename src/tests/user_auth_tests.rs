@@ -1,6 +1,6 @@
+use super::get_cookie;
 use crate::client::builder::RustbloxClientBuilder;
 use crate::client::RustbloxClient;
-use super::get_cookie;
 
 async fn create_authed_client() -> RustbloxClient {
     let client = RustbloxClientBuilder::new()
@@ -16,7 +16,9 @@ async fn create_authed_client() -> RustbloxClient {
 #[tokio::test]
 async fn change_display_name() {
     let client = create_authed_client().await;
-    let request = client.change_display_name(1103782610, "TestingName".to_string()).await;
+    let request = client
+        .change_display_name(1103782610, "TestingName".to_string())
+        .await;
     println!("{:#?}", request);
     assert!(request.is_ok());
 }
@@ -28,7 +30,6 @@ async fn get_authed_user() {
     println!("{:#?}", request);
     assert!(request.is_ok());
 }
-
 
 #[tokio::test]
 async fn get_authed_user_age_bracket() {
@@ -57,7 +58,9 @@ async fn get_authed_user_roles() {
 #[tokio::test]
 async fn validate_display_name() {
     let client = create_authed_client().await;
-    let request = client.validate_user_display_name(1103782610, "TestingName".to_string()).await;
+    let request = client
+        .validate_user_display_name(1103782610, "TestingName".to_string())
+        .await;
     println!("{:#?}", request);
     assert!(request.is_ok());
 }

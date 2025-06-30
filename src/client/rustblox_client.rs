@@ -132,7 +132,9 @@ impl RustbloxClient {
             Ok(inner) => inner,
             Err(why) => {
                 warn!("The CSRF RwLock is poisoned:\n{why}");
-                return Err(ClientError::LoginFailed("The CSRF RwLock is poisoned".into()));
+                return Err(ClientError::LoginFailed(
+                    "The CSRF RwLock is poisoned".into(),
+                ));
             }
         };
         *csrf = Some(csrf_string);
@@ -208,7 +210,7 @@ impl RustbloxClient {
                 let err_body_text = response.text().await.map_err(|e| {
                     RequestError::RequestError(
                         components.url.clone(),
-                        format!("Failed to get error response body:\n{}", e)
+                        format!("Failed to get error response body:\n{}", e),
                     )
                 })?;
                 let err_body = serde_json::from_str::<RobloxApiErrors>(err_body_text.as_str()).map_err(|e| {
@@ -227,20 +229,23 @@ impl RustbloxClient {
                         if err_body.errors.first().unwrap().code != 0 {
                             return Err(RequestError::RequestError(
                                 components.url.clone(),
-                                format!("Unknown 403 error:\n{}", err_body_text)
+                                format!("Unknown 403 error:\n{}", err_body_text),
                             ));
                         }
 
                         // Now we definitely have a 403 Token Validation Failed
                         if self.auto_reauth && !tried_reauth {
                             if err_h.contains_key("x-csrf-token") {
-                                let header_csrf = err_h.get("x-csrf-token").unwrap().to_str().unwrap();
-                                let mut self_csrf = self.csrf_token.write().map_err(|e| RequestError::ReauthenticationFailed(e.to_string()))?;
+                                let header_csrf =
+                                    err_h.get("x-csrf-token").unwrap().to_str().unwrap();
+                                let mut self_csrf = self.csrf_token.write().map_err(|e| {
+                                    RequestError::ReauthenticationFailed(e.to_string())
+                                })?;
                                 *self_csrf = Some(header_csrf.into());
                             } else {
-                                self.login()
-                                    .await
-                                    .map_err(|e| RequestError::ReauthenticationFailed(e.to_string()))?;
+                                self.login().await.map_err(|e| {
+                                    RequestError::ReauthenticationFailed(e.to_string())
+                                })?;
                             }
 
                             return self.make_request::<T>(components, true).await;

@@ -175,9 +175,7 @@ impl RustbloxClient {
         page_cursor: Option<String>,
     ) -> Result<Page<MinimalUserInfo>, RequestError> {
         let real_limit = if limit.is_some() { limit.unwrap() } else { 10 };
-        let mut url = format!(
-            "{BASE_URL}/users/search?keyword={username}&limit={real_limit}"
-        );
+        let mut url = format!("{BASE_URL}/users/search?keyword={username}&limit={real_limit}");
         if page_cursor.is_some() {
             url = format!("{}&cursor={}", url, page_cursor.unwrap());
         }

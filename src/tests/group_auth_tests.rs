@@ -1,6 +1,6 @@
+use super::get_cookie;
 use crate::client::builder::RustbloxClientBuilder;
 use crate::client::RustbloxClient;
-use super::get_cookie;
 
 async fn create_authed_client() -> RustbloxClient {
     let client = RustbloxClientBuilder::new()

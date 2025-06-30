@@ -1,2 +1,2 @@
-mod user;
 mod group;
+mod user;

@@ -1,8 +1,11 @@
 use std::sync::{Arc, RwLock};
 
-use reqwest::{header::{HeaderMap, HeaderValue}, Method};
-use crate::client::{RequestComponents, RustbloxClient};
 use super::get_cookie;
+use crate::client::{RequestComponents, RustbloxClient};
+use reqwest::{
+    header::{HeaderMap, HeaderValue},
+    Method,
+};
 
 #[tokio::test]
 async fn bad_cookie_test() {
@@ -10,7 +13,7 @@ async fn bad_cookie_test() {
         reqwest_client: Default::default(),
         roblox_cookie: Some("_|WARNING:bad-cookie".to_string()),
         csrf_token: Arc::new(RwLock::new(Some("bad-token".to_string()))),
-        auto_reauth: true
+        auto_reauth: true,
     };
 
     let result = client.batch_get_requests(1).await;
@@ -24,7 +27,7 @@ async fn bad_token_refresh() {
         reqwest_client: Default::default(),
         roblox_cookie: Some(format!(".ROBLOSECURITY={}", get_cookie())),
         csrf_token: Arc::new(RwLock::new(Some("bad-token".to_string()))),
-        auto_reauth: true
+        auto_reauth: true,
     };
 
     // Some manual stuff because I don't plan on supporting this endpoint
@@ -32,7 +35,10 @@ async fn bad_token_refresh() {
     let body = serde_json::json!({ "description": "testing" }).to_string();
     let mut headers = HeaderMap::new();
     headers.append("Content-Type", HeaderValue::from_static("application/json"));
-    headers.append("Content-Length", HeaderValue::from_str(&body.as_bytes().len().to_string()).unwrap());
+    headers.append(
+        "Content-Length",
+        HeaderValue::from_str(&body.as_bytes().len().to_string()).unwrap(),
+    );
 
     let components = RequestComponents {
         needs_auth: true,
@@ -41,7 +47,9 @@ async fn bad_token_refresh() {
         headers: Some(headers),
         body: Some(body),
     };
-    let result = client.make_request::<serde_json::Value>(components, false).await;
+    let result = client
+        .make_request::<serde_json::Value>(components, false)
+        .await;
     println!("{:#?}", result);
     assert!(result.is_ok());
 }

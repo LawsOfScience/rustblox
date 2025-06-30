@@ -1,9 +1,9 @@
 use crate::client::{RequestComponents, RustbloxClient};
 use crate::error::RequestError;
 use crate::structs::group::{GroupMemberInfo, GroupRolesList, UserGroup};
+use crate::structs::user::MinimalUserInfo;
 use crate::structs::{DataWrapper, Page, SortOrder};
 use reqwest::Method;
-use crate::structs::user::MinimalUserInfo;
 
 const BASE_URL: &str = "https://groups.roblox.com";
 
@@ -92,7 +92,7 @@ impl RustbloxClient {
         role_id: usize,
         limit: Option<usize>,
         cursor: Option<String>,
-        sort_order: Option<SortOrder>
+        sort_order: Option<SortOrder>,
     ) -> Result<Page<MinimalUserInfo>, RequestError> {
         let real_limit = if limit.is_some() { limit.unwrap() } else { 10 };
         let mut url =
@@ -127,7 +127,10 @@ impl RustbloxClient {
     ///
     /// This function will error if:
     /// - The endpoint responds with an error.
-    pub async fn get_user_group_roles(&self, user_id: usize) -> Result<DataWrapper<UserGroup>, RequestError> {
+    pub async fn get_user_group_roles(
+        &self,
+        user_id: usize,
+    ) -> Result<DataWrapper<UserGroup>, RequestError> {
         let url = format!("{BASE_URL}/v1/users/{user_id}/groups/roles");
 
         let components = RequestComponents {

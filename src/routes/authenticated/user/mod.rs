@@ -1,8 +1,11 @@
-use reqwest::header::{HeaderMap, HeaderValue};
-use reqwest::Method;
 use crate::client::{RequestComponents, RustbloxClient};
 use crate::error::RequestError;
-use crate::structs::user::{AuthenticatedUserAgeBracket, AuthenticatedUserCountryCode, AuthenticatedUserRoles, MinimalAuthenticatedUser};
+use crate::structs::user::{
+    AuthenticatedUserAgeBracket, AuthenticatedUserCountryCode, AuthenticatedUserRoles,
+    MinimalAuthenticatedUser,
+};
+use reqwest::header::{HeaderMap, HeaderValue};
+use reqwest::Method;
 
 const BASE_URL: &str = "https://users.roblox.com/v1";
 
@@ -27,7 +30,11 @@ impl RustbloxClient {
     /// - Status 403 code 0: Token validation failed
     /// - Status 403 code 7: The user ID is invalid
     /// - Status 429 code 5: Display name updates have been throttled
-    pub async fn change_display_name(&self, user_id: usize, new_name: String) -> Result<(), RequestError> {
+    pub async fn change_display_name(
+        &self,
+        user_id: usize,
+        new_name: String,
+    ) -> Result<(), RequestError> {
         let url = format!("{BASE_URL}/users/{user_id}/display-names");
 
         let body = json!({
@@ -50,7 +57,8 @@ impl RustbloxClient {
             body: Some(body.to_string()),
         };
 
-        self.make_request::<serde_json::Value>(components, false).await?;
+        self.make_request::<serde_json::Value>(components, false)
+            .await?;
         Ok(())
     }
 
@@ -77,7 +85,9 @@ impl RustbloxClient {
             body: None,
         };
 
-        let data = self.make_request::<MinimalAuthenticatedUser>(components, false).await?;
+        let data = self
+            .make_request::<MinimalAuthenticatedUser>(components, false)
+            .await?;
         Ok(data)
     }
 
@@ -93,7 +103,9 @@ impl RustbloxClient {
     ///
     /// Possible error responses include:
     /// - Status 401 code 0: Authorization denied
-    pub async fn get_authenticated_user_age_bracket(&self) -> Result<AuthenticatedUserAgeBracket, RequestError> {
+    pub async fn get_authenticated_user_age_bracket(
+        &self,
+    ) -> Result<AuthenticatedUserAgeBracket, RequestError> {
         let url = format!("{BASE_URL}/users/authenticated/age-bracket");
 
         let components = RequestComponents {
@@ -104,7 +116,9 @@ impl RustbloxClient {
             body: None,
         };
 
-        let data = self.make_request::<AuthenticatedUserAgeBracket>(components, false).await?;
+        let data = self
+            .make_request::<AuthenticatedUserAgeBracket>(components, false)
+            .await?;
         Ok(data)
     }
 
@@ -120,7 +134,9 @@ impl RustbloxClient {
     ///
     /// Possible error responses include:
     /// - Status 401 code 0: Authorization denied
-    pub async fn get_authenticated_user_country_code(&self) -> Result<AuthenticatedUserCountryCode, RequestError> {
+    pub async fn get_authenticated_user_country_code(
+        &self,
+    ) -> Result<AuthenticatedUserCountryCode, RequestError> {
         let url = format!("{BASE_URL}/users/authenticated/country-code");
 
         let components = RequestComponents {
@@ -131,7 +147,9 @@ impl RustbloxClient {
             body: None,
         };
 
-        let data = self.make_request::<AuthenticatedUserCountryCode>(components, false).await?;
+        let data = self
+            .make_request::<AuthenticatedUserCountryCode>(components, false)
+            .await?;
         Ok(data)
     }
 
@@ -147,7 +165,9 @@ impl RustbloxClient {
     ///
     /// Possible error responses include:
     /// - Status 401 code 0: Authorization denied
-    pub async fn get_authenticated_user_roles(&self) -> Result<AuthenticatedUserRoles, RequestError> {
+    pub async fn get_authenticated_user_roles(
+        &self,
+    ) -> Result<AuthenticatedUserRoles, RequestError> {
         let url = format!("{BASE_URL}/users/authenticated/roles");
 
         let components = RequestComponents {
@@ -158,7 +178,9 @@ impl RustbloxClient {
             body: None,
         };
 
-        let data = self.make_request::<AuthenticatedUserRoles>(components, false).await?;
+        let data = self
+            .make_request::<AuthenticatedUserRoles>(components, false)
+            .await?;
         Ok(data)
     }
 
@@ -181,8 +203,13 @@ impl RustbloxClient {
     /// - Status 401 code 0: Authorization denied
     /// - Status 403 code 7: The user ID is invalid
     /// - Status 429 code 5: Display name updates have been throttled
-    pub async fn validate_user_display_name(&self, user_id: usize, display_name: String) -> Result<(), RequestError> {
-        let url = format!("{BASE_URL}/users/{user_id}/display-names/validate?displayName={display_name}");
+    pub async fn validate_user_display_name(
+        &self,
+        user_id: usize,
+        display_name: String,
+    ) -> Result<(), RequestError> {
+        let url =
+            format!("{BASE_URL}/users/{user_id}/display-names/validate?displayName={display_name}");
 
         let components = RequestComponents {
             needs_auth: true,
@@ -192,7 +219,8 @@ impl RustbloxClient {
             body: None,
         };
 
-        self.make_request::<serde_json::Value>(components, false).await?;
+        self.make_request::<serde_json::Value>(components, false)
+            .await?;
 
         Ok(())
     }

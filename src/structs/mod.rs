@@ -1,5 +1,5 @@
-pub mod user;
 pub mod group;
+pub mod user;
 
 /// Represents a sorting order for API endpoints
 /// that can use it.
