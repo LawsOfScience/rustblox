@@ -30,13 +30,6 @@ pub struct GroupRolesList {
     pub roles: Vec<GroupRole>,
 }
 
-/// Represents a list of groups that a user is in. Used
-/// in [`get_user_group_roles`](crate::client::RustbloxClient::get_user_group_roles).
-#[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
-pub struct UserGroupList {
-    pub data: Vec<UserGroup>
-}
-
 /// Represents a group that a user is in, containing the group info
 /// and info about the user's rank/role in it. Used as a component
 /// of [`UserGroupList`].

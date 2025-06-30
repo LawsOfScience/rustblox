@@ -2,23 +2,12 @@ use crate::client::RequestComponents;
 use crate::client::RustbloxClient;
 use crate::error::RequestError;
 use crate::structs::user::{MinimalUserInfo, PreviousUsername, UserInfo};
+use crate::structs::DataWrapper;
 use crate::structs::{Page, SortOrder};
 use reqwest::header::{HeaderMap, HeaderValue};
 use reqwest::Method;
 
 const BASE_URL: &str = "https://users.roblox.com/v1";
-
-#[allow(dead_code)]
-#[derive(Deserialize, Debug)]
-struct MinimalUserInfoObject {
-    data: Vec<MinimalUserInfo>,
-}
-
-#[allow(dead_code)]
-#[derive(Deserialize, Debug)]
-struct MinimalUserInfoWithReqdObject {
-    data: Vec<MinimalUserInfo>,
-}
 
 impl RustbloxClient {
     /// Gets a user's previous usernames, given their user ID.
@@ -121,7 +110,7 @@ impl RustbloxClient {
         };
 
         let response = self
-            .make_request::<MinimalUserInfoObject>(components, false)
+            .make_request::<DataWrapper<MinimalUserInfo>>(components, false)
             .await?;
 
         Ok(response.data)
@@ -163,7 +152,7 @@ impl RustbloxClient {
         };
 
         let response = self
-            .make_request::<MinimalUserInfoWithReqdObject>(components, false)
+            .make_request::<DataWrapper<MinimalUserInfo>>(components, false)
             .await?;
 
         Ok(response.data)

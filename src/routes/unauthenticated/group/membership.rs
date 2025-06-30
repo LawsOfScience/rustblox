@@ -1,7 +1,7 @@
 use crate::client::{RequestComponents, RustbloxClient};
 use crate::error::RequestError;
-use crate::structs::group::{GroupMemberInfo, GroupRolesList, UserGroupList};
-use crate::structs::{Page, SortOrder};
+use crate::structs::group::{GroupMemberInfo, GroupRolesList, UserGroup};
+use crate::structs::{DataWrapper, Page, SortOrder};
 use reqwest::Method;
 use crate::structs::user::MinimalUserInfo;
 
@@ -127,7 +127,7 @@ impl RustbloxClient {
     ///
     /// This function will error if:
     /// - The endpoint responds with an error.
-    pub async fn get_user_group_roles(&self, user_id: usize) -> Result<UserGroupList, RequestError> {
+    pub async fn get_user_group_roles(&self, user_id: usize) -> Result<DataWrapper<UserGroup>, RequestError> {
         let url = format!("{BASE_URL}/v1/users/{user_id}/groups/roles");
 
         let components = RequestComponents {
@@ -138,7 +138,7 @@ impl RustbloxClient {
             body: None,
         };
         let info = self
-            .make_request::<UserGroupList>(components, false)
+            .make_request::<DataWrapper<UserGroup>>(components, false)
             .await?;
 
         Ok(info)
