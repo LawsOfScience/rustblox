@@ -16,4 +16,5 @@
 - [x] Get users in a role `GET /v1/groups/{groupId}/roles/{roleSetId}/users` (NA)
 - [x] Get list of members `GET /v1/groups/{groupId}/users` (NA)
 - [ ] Get groups of authed user's friends `GET /v1/users/{userId}/friends/groups/roles` (NA)
+  - Not being added unless requested, seems to be too giant of an endpoint
 - [x] Get group roles for user `GET /v1/users/{userId}/groups/roles` (NA)

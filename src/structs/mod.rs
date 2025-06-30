@@ -14,3 +14,8 @@ pub struct Page<T> {
     pub next_page_cursor: Option<String>,
     pub data: Vec<T>,
 }
+
+#[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
+pub struct DataWrapper<T> {
+    pub data: Vec<T>,
+}
