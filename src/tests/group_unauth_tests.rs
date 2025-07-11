@@ -33,3 +33,15 @@ async fn get_members_in_group_role() {
     println!("{:#?}", result);
     assert!(result.is_ok());
 }
+
+
+#[tokio::test]
+async fn get_group_info() {
+    let client = RustbloxClientBuilder::new().build().unwrap();
+
+    let group_info = client
+        .get_group_info(5684648)
+        .await;
+    println!("{:#?}", group_info);
+    assert!(group_info.is_ok());
+}

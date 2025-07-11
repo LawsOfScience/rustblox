@@ -31,12 +31,11 @@ pub struct GroupRolesList {
 }
 
 /// Represents a group that a user is in, containing the group info
-/// and info about the user's rank/role in it. Used as a component
-/// of [`UserGroupList`].
+/// and info about the user's rank/role in it.
 #[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct UserGroup {
-    pub group: UserGroupInfo,
+    pub group: GroupInfo,
     pub role: UserRoleInGroup,
     #[serde(default)]
     pub is_primary_group: bool,
@@ -50,10 +49,11 @@ pub struct GroupShout {
 }
 
 /// Contains all the information about a group that a certain user
-/// is in. Used as a component of [`UserGroup`].
+/// is in. Used as a component of [`UserGroup`] and in
+/// [`get_group_info`](crate::client::RustbloxClient::get_group_info).
 #[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
-pub struct UserGroupInfo {
+pub struct GroupInfo {
     pub id: usize,
     pub name: String,
     pub description: String,
@@ -63,6 +63,7 @@ pub struct UserGroupInfo {
     pub is_builders_club_only: bool,
     pub public_entry_allowed: bool,
     pub has_verified_badge: bool,
+    pub is_locked: Option<bool>,
 }
 
 /// Contains information about a user's role in a certain group. Used
